@@ -71,6 +71,11 @@ namespace KinematicCharacterController.Examples
         public Transform CameraFollowPoint;
         public float CrouchedCapsuleHeight = 1f;
 
+        [Header ("Animations")]
+        [SerializeField]
+        private Animator _animator;
+
+
         public CharacterState CurrentCharacterState { get; private set; }
 
         private Collider[] _probedColliders = new Collider[8];
@@ -301,6 +306,11 @@ namespace KinematicCharacterController.Examples
 
                             // Smooth movement Velocity
                             currentVelocity = Vector3.Lerp(currentVelocity, targetMovementVelocity, 1f - Mathf.Exp(-StableMovementSharpness * deltaTime));
+
+                            //Calcultate forward direction
+                            float forwardValue = Vector3.Dot(currentVelocity, Motor.CharacterForward);
+
+                            _animator.SetFloat("forward", forwardValue);
                         }
                         // Air movement
                         else
