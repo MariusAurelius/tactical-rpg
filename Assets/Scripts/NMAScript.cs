@@ -10,6 +10,10 @@ public class NMAscript : MonoBehaviour
     private GameObject floor = null;
     private Bounds bnd;
 
+    [Header("Animations")]
+    [SerializeField]
+    private Animator _animator;
+
     private void Start()
     {
         nma = this.gameObject.GetComponent<NavMeshAgent>();
@@ -20,10 +24,13 @@ public class NMAscript : MonoBehaviour
     }
     private void Update()
     {
-        if (nma.remainingDistance < 0.1f)
+        if (nma.remainingDistance < 0.3f)
         {
             SetRandomDestination();
         }
+
+        // Update the animator with the current speed
+        _animator.SetFloat("speed", nma.velocity.magnitude);
     }
     private void SetRandomDestination()
     {
