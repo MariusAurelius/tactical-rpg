@@ -2502,11 +2502,9 @@ MonoBehaviour:
   spawnPoint: {fileID: 1312100707}
   compositions:
   - type: 1
-    count: 2
+    count: 10
   - type: 2
-    count: 2
-  - type: 3
-    count: 2
+    count: 10
   teamParent: {fileID: 1421173516}
 --- !u!1 &1332294734
 GameObject:
@@ -3359,6 +3357,59 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1752080577}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1761433660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1761433662}
+  - component: {fileID: 1761433661}
+  m_Layer: 0
+  m_Name: SubTeamManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1761433661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761433660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eabcfdb7f38548e09d5dced35242f9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamConfigurations:
+  - teamId: 1
+    teamParent: {fileID: 1421173516}
+    minSubTeams: 2
+    minUnitsPerSubTeam: 2
+  - teamId: 2
+    teamParent: {fileID: 344082331}
+    minSubTeams: 2
+    minUnitsPerSubTeam: 2
+--- !u!4 &1761433662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761433660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.404583, y: 17.415737, z: 35.636314}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1849965085
 GameObject:
   m_ObjectHideFlags: 0
@@ -3515,11 +3566,9 @@ MonoBehaviour:
   spawnPoint: {fileID: 1936128277}
   compositions:
   - type: 1
-    count: 2
+    count: 10
   - type: 2
-    count: 2
-  - type: 3
-    count: 2
+    count: 10
   teamParent: {fileID: 344082331}
 --- !u!1 &1960760441
 GameObject:
@@ -3845,3 +3894,4 @@ SceneRoots:
   - {fileID: 1332294735}
   - {fileID: 1421173516}
   - {fileID: 344082331}
+  - {fileID: 1761433662}

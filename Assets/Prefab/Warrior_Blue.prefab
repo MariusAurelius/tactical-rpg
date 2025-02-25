@@ -2391,9 +2391,9 @@ GameObject:
   m_Component:
   - component: {fileID: 452472}
   - component: {fileID: 9523868}
-  - component: {fileID: 6522385499144109342}
   - component: {fileID: 8035176661657540105}
   - component: {fileID: 818879669608276275}
+  - component: {fileID: -1859271179134152684}
   m_Layer: 0
   m_Name: Warrior_Blue
   m_TagString: Untagged
@@ -2443,19 +2443,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &6522385499144109342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 172688}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba2a40eaa3300421ebd58a5457e38c21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 9523868}
 --- !u!64 &8035176661657540105
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -2500,6 +2487,30 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &-1859271179134152684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 577f83b32bf5f2149b460be12d4818f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isLeader: 0
+  maxHp: 7
+  currentHp: 7
+  atk: 2
+  atkSpeed: 1
+  atkReach: 5
+  movSpeed: 2
+  power: 10
+  _animator: {fileID: 9523868}
+  currentBehaviour: 0
+  goal: {fileID: 0}
+  currentEnemy: {fileID: 0}
 --- !u!1 &172980
 GameObject:
   m_ObjectHideFlags: 0

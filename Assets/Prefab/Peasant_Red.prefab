@@ -2137,8 +2137,8 @@ GameObject:
   - component: {fileID: 408822}
   - component: {fileID: 9551078}
   - component: {fileID: -9049047495038411172}
-  - component: {fileID: 7824852435193837622}
   - component: {fileID: 3854087202512195584}
+  - component: {fileID: 3785325629824609890}
   m_Layer: 0
   m_Name: Peasant_Red
   m_TagString: Untagged
@@ -2210,19 +2210,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 0}
---- !u!114 &7824852435193837622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 171706}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba2a40eaa3300421ebd58a5457e38c21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 9551078}
 --- !u!195 &3854087202512195584
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2245,6 +2232,30 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!114 &3785325629824609890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c049ff1e62a3024b86d355053b09bfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isLeader: 0
+  maxHp: 7
+  currentHp: 7
+  atk: 2
+  atkSpeed: 1
+  atkReach: 5
+  movSpeed: 2
+  power: 5
+  _animator: {fileID: 9551078}
+  currentBehaviour: 0
+  goal: {fileID: 0}
+  currentEnemy: {fileID: 0}
 --- !u!1 &174482
 GameObject:
   m_ObjectHideFlags: 0
