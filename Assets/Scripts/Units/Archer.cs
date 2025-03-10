@@ -4,7 +4,7 @@ using AgentScript;
 
 public class Archer : Unit
 {
-    Archer()
+    Archer() 
     {
         this.maxHp = 7;
         this.currentHp = this.maxHp;
