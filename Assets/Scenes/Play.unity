@@ -438,6 +438,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1666506790}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &344082330
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 344082331}
+  m_Layer: 0
+  m_Name: Team_Blue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &344082331
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344082330}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 46.574184, y: 0.049797893, z: -110.22246}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &347838624
 GameObject:
   m_ObjectHideFlags: 0
@@ -2429,7 +2460,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1312100707}
-  - component: {fileID: 1312100706}
+  - component: {fileID: 1312100708}
   m_Layer: 0
   m_Name: Spawn_Red
   m_TagString: Untagged
@@ -2437,20 +2468,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1312100706
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1312100705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1109d3e282f09417c9de56271981f7ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cubePrefab: {fileID: 5402130605783797370, guid: 2d9dcae9b380a424e8de11e0a01c7670, type: 3}
-  spawnPoint: {fileID: 1312100705}
 --- !u!4 &1312100707
 Transform:
   m_ObjectHideFlags: 0
@@ -2459,13 +2476,36 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1312100705}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -85.1, y: 1, z: -128.2}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -86.095436, y: 0.28479522, z: -129.08188}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1332294735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1312100708
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1312100705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b358cbbadc540fab534f0dfec95fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamId: 1
+  warriorPrefab: {fileID: 5402130605783797370, guid: 2d9dcae9b380a424e8de11e0a01c7670, type: 3}
+  peasentPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
+  knightPrefab: {fileID: 104176, guid: 359a3881d0d0e4143a67b57d6482e854, type: 3}
+  spawnPoint: {fileID: 1312100707}
+  compositions:
+  - type: 1
+    count: 10
+  - type: 2
+    count: 10
+  teamParent: {fileID: 1421173516}
 --- !u!1 &1332294734
 GameObject:
   m_ObjectHideFlags: 0
@@ -2497,6 +2537,8 @@ Transform:
   m_Children:
   - {fileID: 1339103102}
   - {fileID: 1666506790}
+  - {fileID: 1312100707}
+  - {fileID: 1936128277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1339103101
@@ -2802,6 +2844,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1666506790}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1421173515
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1421173516}
+  m_Layer: 0
+  m_Name: Team_Red
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1421173516
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1421173515}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 46.574184, y: 0.049797893, z: -110.22246}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1430704002
 GameObject:
@@ -3284,6 +3357,59 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1752080577}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1761433660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1761433662}
+  - component: {fileID: 1761433661}
+  m_Layer: 0
+  m_Name: SubTeamManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1761433661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761433660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eabcfdb7f38548e09d5dced35242f9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamConfigurations:
+  - teamId: 1
+    teamParent: {fileID: 1421173516}
+    minSubTeams: 2
+    minUnitsPerSubTeam: 2
+  - teamId: 2
+    teamParent: {fileID: 344082331}
+    minSubTeams: 2
+    minUnitsPerSubTeam: 2
+--- !u!4 &1761433662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1761433660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 15.404583, y: 17.415737, z: 35.636314}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1849965085
 GameObject:
   m_ObjectHideFlags: 0
@@ -3398,7 +3524,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1936128277}
-  - component: {fileID: 1936128276}
+  - component: {fileID: 1936128278}
   m_Layer: 0
   m_Name: Spawner_Blue
   m_TagString: Untagged
@@ -3406,20 +3532,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1936128276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1936128275}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1109d3e282f09417c9de56271981f7ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cubePrefab: {fileID: 172688, guid: 6724992a26d21854798810e3993415be, type: 3}
-  spawnPoint: {fileID: 1936128275}
 --- !u!4 &1936128277
 Transform:
   m_ObjectHideFlags: 0
@@ -3428,13 +3540,36 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1936128275}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 79, y: 1, z: 35}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 78.00456, y: 0.28479522, z: 34.118114}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1332294735}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1936128278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936128275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23b358cbbadc540fab534f0dfec95fc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  teamId: 2
+  warriorPrefab: {fileID: 172688, guid: 6724992a26d21854798810e3993415be, type: 3}
+  peasentPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
+  knightPrefab: {fileID: 142034, guid: b81ba67e44b1b174d9ef4491f146ee35, type: 3}
+  spawnPoint: {fileID: 1936128277}
+  compositions:
+  - type: 1
+    count: 10
+  - type: 2
+    count: 10
+  teamParent: {fileID: 344082331}
 --- !u!1 &1960760441
 GameObject:
   m_ObjectHideFlags: 0
@@ -3757,5 +3892,6 @@ SceneRoots:
   - {fileID: 654685124}
   - {fileID: 1386773688}
   - {fileID: 1332294735}
-  - {fileID: 1312100707}
-  - {fileID: 1936128277}
+  - {fileID: 1421173516}
+  - {fileID: 344082331}
+  - {fileID: 1761433662}

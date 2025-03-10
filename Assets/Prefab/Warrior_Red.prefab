@@ -41,7 +41,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 111886, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
       propertyPath: m_Name
-      value: Character_Knight_Black Variant
+      value: Warrior_Red
       objectReference: {fileID: 0}
     - target: {fileID: 413626, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
       propertyPath: m_LocalScale.x
@@ -122,7 +122,7 @@ PrefabInstance:
       addedObject: {fileID: 4768571886944529374}
     - targetCorrespondingSourceObject: {fileID: 111886, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2795996887483178447}
+      addedObject: {fileID: -562913420599140793}
   m_SourcePrefab: {fileID: 100100000, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
 --- !u!1 &5402130605783797370 stripped
 GameObject:
@@ -173,7 +173,7 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &2795996887483178447
+--- !u!114 &-562913420599140793
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -182,10 +182,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 5402130605783797370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba2a40eaa3300421ebd58a5457e38c21, type: 3}
+  m_Script: {fileID: 11500000, guid: 577f83b32bf5f2149b460be12d4818f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isLeader: 0
+  maxHp: 7
+  currentHp: 7
+  atk: 2
+  atkSpeed: 1
+  atkReach: 5
+  movSpeed: 2
+  power: 10
   _animator: {fileID: 5402130605793231686}
+  currentBehaviour: 0
+  goal: {fileID: 0}
+  currentEnemy: {fileID: 0}
 --- !u!4 &5402130605784020174 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 413626, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
