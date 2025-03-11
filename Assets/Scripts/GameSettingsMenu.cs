@@ -33,6 +33,8 @@ public class GameSettingsMenu : MonoBehaviour
     // UI components to set the game settings
 
     // blue troops
+    [SerializeField] private TMP_Text CurrentBluePowerText;
+
     [SerializeField] private TMP_Text BlueMaxPowerText;
     [SerializeField] private Slider BlueMaxPowerSlider;
 
@@ -49,6 +51,8 @@ public class GameSettingsMenu : MonoBehaviour
 
 
     // red troops
+    [SerializeField] private TMP_Text CurrentRedPowerText;
+
     [SerializeField] private TMP_Text RedMaxPowerText;
     [SerializeField] private Slider RedMaxPowerSlider;
 
@@ -70,7 +74,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// The current combined power of all the troops of this color, incremented / decremented when the number of troops of a type is 
     /// incremented / decremented.
     /// </summary>
-    private int _bluePower, _redPower;
+    private int _currentBluePower, _currentRedPower;
 
     /// <summary>
     /// The power of this troop type, to get from this troop's class.
@@ -94,11 +98,14 @@ public class GameSettingsMenu : MonoBehaviour
         UpdateGameSettingsUI();
         Debug.Log("gamesettings ui updated");
 
-        _bluePower = _peasantPower * _gameSettings.BluePeasants + _archerPower * _gameSettings.BlueArchers + _warriorPower * _gameSettings.BlueWarriors;
-        _redPower = _peasantPower * _gameSettings.RedPeasants + _archerPower * _gameSettings.RedArchers + _warriorPower * _gameSettings.RedWarriors;
+        _currentBluePower = _peasantPower * _gameSettings.BluePeasants + _archerPower * _gameSettings.BlueArchers + _warriorPower * _gameSettings.BlueWarriors;
+        _currentRedPower = _peasantPower * _gameSettings.RedPeasants + _archerPower * _gameSettings.RedArchers + _warriorPower * _gameSettings.RedWarriors;
 
         UpdateNumberOfTroops(TroopColor.Blue);
         UpdateNumberOfTroops(TroopColor.Red);
+
+        UpdateCurrentBluePowerText();
+        UpdateCurrentRedPowerText();
         Debug.Log("end start");
     }
 
@@ -268,17 +275,17 @@ public class GameSettingsMenu : MonoBehaviour
         switch (troopColor)
         {
             case TroopColor.Blue:
-                if (_bluePower > BlueMaxPowerSlider.value)
+                if (_currentBluePower > BlueMaxPowerSlider.value)
                 {
-                    var powerDiff = _bluePower - BlueMaxPowerSlider.value;
+                    var powerDiff = _currentBluePower - BlueMaxPowerSlider.value;
                     while (powerDiff > 0)
                     {
-                        if (powerDiff >= _warriorPower && troopTypeToIgnore != TroopType.Warrior && BlueWarriorsSlider.value > 0)
+                        if (troopTypeToIgnore != TroopType.Warrior && BlueWarriorsSlider.value > 0)
                         {
                             DecreaseBlueWarriors();
                             Debug.Log("must decrease warriors");
                         }
-                        else if (powerDiff >= _archerPower && troopTypeToIgnore != TroopType.Archer && BlueArchersSlider.value > 0)
+                        else if (troopTypeToIgnore != TroopType.Archer && BlueArchersSlider.value > 0)
                         {
                             DecreaseBlueArchers();
                             Debug.Log("must decrease archers");
@@ -288,30 +295,30 @@ public class GameSettingsMenu : MonoBehaviour
                             DecreaseBluePeasants();
                             Debug.Log("must decrease peasants");
                         }
-                        if (powerDiff == _bluePower - BlueMaxPowerSlider.value) // blue power hasn't changed: can't decrease anymore 
+                        if (powerDiff == _currentBluePower - BlueMaxPowerSlider.value) // blue power hasn't changed: can't decrease anymore 
                                                                                 // due to troop type to ignore > decrease it anyways
                         {
                             troopTypeToIgnore = TroopType.None;
                             Debug.Log("undoing troop type to ignore");
                             // break;
                         }
-                        powerDiff = _bluePower - BlueMaxPowerSlider.value;
+                        powerDiff = _currentBluePower - BlueMaxPowerSlider.value;
                     }
                 }
                 break;
 
             case TroopColor.Red:
-                if (_redPower > RedMaxPowerSlider.value)
+                if (_currentRedPower > RedMaxPowerSlider.value)
                 {
-                    var powerDiff = _redPower - RedMaxPowerSlider.value;
+                    var powerDiff = _currentRedPower - RedMaxPowerSlider.value;
                     while (powerDiff > 0)
                     {
-                        if (powerDiff >= _warriorPower && troopTypeToIgnore != TroopType.Warrior && RedWarriorsSlider.value > 0)
+                        if (troopTypeToIgnore != TroopType.Warrior && RedWarriorsSlider.value > 0)
                         {
                             DecreaseRedWarriors();
                             Debug.Log("must decrease warriors");
                         }
-                        else if (powerDiff >= _archerPower && troopTypeToIgnore != TroopType.Archer && RedArchersSlider.value > 0)
+                        else if (troopTypeToIgnore != TroopType.Archer && RedArchersSlider.value > 0)
                         {
                             DecreaseRedArchers();
                             Debug.Log("must decrease archers");
@@ -321,14 +328,14 @@ public class GameSettingsMenu : MonoBehaviour
                             DecreaseRedPeasants();
                             Debug.Log("must decrease peasants");
                         }
-                        if (powerDiff == _redPower - RedMaxPowerSlider.value) // red power hasn't changed: can't decrease anymore 
+                        if (powerDiff == _currentRedPower - RedMaxPowerSlider.value) // red power hasn't changed: can't decrease anymore 
                                                                                 // due to troop type to ignore > decrease it anyways
                         {
                             troopTypeToIgnore = TroopType.None;
                             // break;
                             Debug.Log("undoing troop type to ignore");
                         }
-                        powerDiff = _redPower - RedMaxPowerSlider.value;
+                        powerDiff = _currentRedPower - RedMaxPowerSlider.value;
                     }
                 }
                 break;
@@ -336,17 +343,35 @@ public class GameSettingsMenu : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates the value of <c>_bluePower</c> based on the slider values.
+    /// Updates the value of <c>_currentBluePower</c> and its text based on the slider values.
     /// </summary>
-    private void UpdateBluePower() {
-        _bluePower =(int) (_peasantPower * BluePeasantsSlider.value + _archerPower * BlueArchersSlider.value + _warriorPower * BlueWarriorsSlider.value);
+    private void UpdateCurrentBluePower() {
+        _currentBluePower =(int) (_peasantPower * BluePeasantsSlider.value + _archerPower * BlueArchersSlider.value + _warriorPower * BlueWarriorsSlider.value);
+        UpdateCurrentBluePowerText();
     }
 
     /// <summary>
-    /// Updates the value of <c>_redPower</c> based on the slider values.
+    /// Updates the text to the value of <c>_currentBluePower</c>.
     /// </summary>
-    private void UpdateRedPower() {
-        _redPower =(int) (_peasantPower * RedPeasantsSlider.value + _archerPower * RedArchersSlider.value + _warriorPower * RedWarriorsSlider.value);
+    private void UpdateCurrentBluePowerText()
+    {
+        CurrentBluePowerText.text = "Current Power: " + _currentBluePower;
+    }
+
+    /// <summary>
+    /// Updates the value of <c>_currentRedPower</c> and its text based on the slider values.
+    /// </summary>
+    private void UpdateCurrentRedPower() {
+        _currentRedPower =(int) (_peasantPower * RedPeasantsSlider.value + _archerPower * RedArchersSlider.value + _warriorPower * RedWarriorsSlider.value);
+        UpdateCurrentRedPowerText();
+    }
+
+    /// <summary>
+    /// Updates the text to the value of <c>_currentBluePower</c>.
+    /// </summary>
+    private void UpdateCurrentRedPowerText()
+    {
+        CurrentRedPowerText.text = "Current Power: " + _currentRedPower;
     }
 
     // change specific value for blue and red troops amount (on +/- button click)
@@ -356,12 +381,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseBluePeasants()
     {
-        if (_bluePower + _peasantPower <= BlueMaxPowerSlider.value)
+        if (_currentBluePower + _peasantPower <= BlueMaxPowerSlider.value)
         {
             var increased = IncreaseValue(BluePeasantsSlider, BluePeasantsText);
             if (increased)
             {
-                _bluePower += _peasantPower;
+                _currentBluePower += _peasantPower;
+                UpdateCurrentBluePowerText();
             }
         }
     }
@@ -374,8 +400,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(BluePeasantsSlider, BluePeasantsText);
         if (decreased)
         {
-            _bluePower -= _peasantPower;
+            _currentBluePower -= _peasantPower;
+            UpdateCurrentBluePowerText();
         }
+        //return decreased;
     }
 
     /// <summary>
@@ -383,12 +411,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseRedPeasants()
     {
-        if (_redPower + _peasantPower <= RedMaxPowerSlider.value)
+        if (_currentRedPower + _peasantPower <= RedMaxPowerSlider.value)
         {
             var increased = IncreaseValue(RedPeasantsSlider, RedPeasantsText);
             if (increased)
             {
-                _redPower += _peasantPower;
+                _currentRedPower += _peasantPower;
+                UpdateCurrentRedPowerText();
             }
         }
     }
@@ -401,8 +430,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(RedPeasantsSlider, RedPeasantsText);
         if (decreased)
         {
-            _redPower -= _peasantPower;
+            _currentRedPower -= _peasantPower;
+            UpdateCurrentRedPowerText();
         }
+        //return decreased;
     }
 
     /// <summary>
@@ -410,12 +441,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseBlueWarriors()
     {
-        if (_bluePower + _warriorPower <= BlueMaxPowerSlider.value)
+        if (_currentBluePower + _warriorPower <= BlueMaxPowerSlider.value)
         {
             var increased = IncreaseValue(BlueWarriorsSlider, BlueWarriorsText);
             if (increased)
             {
-                _bluePower += _warriorPower;
+                _currentBluePower += _warriorPower;
+                UpdateCurrentBluePowerText();
             }
         }
     }
@@ -428,8 +460,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(BlueWarriorsSlider, BlueWarriorsText);
         if (decreased)
         {
-            _bluePower -= _warriorPower;
+            _currentBluePower -= _warriorPower;
+            UpdateCurrentBluePowerText();
         }
+        //return decreased;
     }
 
     /// <summary>
@@ -437,12 +471,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseRedWarriors()
     {
-        if (_redPower + _warriorPower <= RedMaxPowerSlider.value)
+        if (_currentRedPower + _warriorPower <= RedMaxPowerSlider.value)
         {
             var increased = IncreaseValue(RedWarriorsSlider, RedWarriorsText);
             if (increased)
             {
-                _redPower += _warriorPower;
+                _currentRedPower += _warriorPower;
+                UpdateCurrentRedPowerText();
             }
         }
     }
@@ -455,8 +490,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(RedWarriorsSlider, RedWarriorsText);
         if (decreased)
         {
-            _redPower -= _warriorPower;
+            _currentRedPower -= _warriorPower;
+            UpdateCurrentRedPowerText();
         }
+        //return decreased;
     }
 
     /// <summary>
@@ -464,12 +501,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseBlueArchers()
     {
-        if (_bluePower + _archerPower <= BlueMaxPowerSlider.value)
+        if (_currentBluePower + _archerPower <= BlueMaxPowerSlider.value)
         {
             var increased = IncreaseValue(BlueArchersSlider, BlueArchersText);
             if (increased)
             {
-                _bluePower += _archerPower;
+                _currentBluePower += _archerPower;
+                UpdateCurrentBluePowerText();
             }
         }
     }
@@ -482,8 +520,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(BlueArchersSlider, BlueArchersText);
         if (decreased)
         {
-            _bluePower -= _archerPower;
+            _currentBluePower -= _archerPower;
+            UpdateCurrentBluePowerText();
         }
+        //return decreased;
     }
 
     /// <summary>
@@ -491,12 +531,13 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void IncreaseRedArchers()
     {
-        if (_redPower + _archerPower <= RedMaxPowerSlider.value)
+        if (_currentRedPower + _archerPower <= RedMaxPowerSlider.value)
         {
             var increased = IncreaseValue(RedArchersSlider, RedArchersText);
             if (increased)
             {
-                _redPower += _archerPower;
+                _currentRedPower += _archerPower;
+                UpdateCurrentRedPowerText();
             }
         }
     }
@@ -509,8 +550,10 @@ public class GameSettingsMenu : MonoBehaviour
         var decreased = DecreaseValue(RedArchersSlider, RedArchersText);
         if (decreased)
         {
-            _redPower -= _archerPower;
+            _currentRedPower -= _archerPower;
+            UpdateCurrentRedPowerText();
         }
+        //return decreased;
     }
 
 
@@ -560,7 +603,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateBluePeasants(float bluePeasants)
     {
-        UpdateBluePower();
+        UpdateCurrentBluePower();
         BluePeasantsText.text = ((int)bluePeasants).ToString();
         UpdateNumberOfTroops(TroopColor.Blue, TroopType.Peasant);
     }
@@ -570,7 +613,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateRedPeasants(float redPeasants)
     {
-        UpdateRedPower();
+        UpdateCurrentRedPower();
         RedPeasantsText.text = ((int)redPeasants).ToString();
         UpdateNumberOfTroops(TroopColor.Red, TroopType.Peasant);
     }
@@ -580,7 +623,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateBlueArchers(float blueArchers)
     {
-        UpdateBluePower();
+        UpdateCurrentBluePower();
         BlueArchersText.text = ((int)blueArchers).ToString();
         UpdateNumberOfTroops(TroopColor.Blue, TroopType.Archer);
     }
@@ -590,7 +633,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateRedArchers(float redArchers)
     {
-        UpdateRedPower();
+        UpdateCurrentRedPower();
         RedArchersText.text = ((int)redArchers).ToString();
         UpdateNumberOfTroops(TroopColor.Red, TroopType.Archer);
     }
@@ -600,7 +643,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateBlueWarriors(float blueWarriors)
     {
-        UpdateBluePower();
+        UpdateCurrentBluePower();
         BlueWarriorsText.text = ((int)blueWarriors).ToString();
         UpdateNumberOfTroops(TroopColor.Blue, TroopType.Warrior);
     }
@@ -610,7 +653,7 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     public void UpdateRedWarriors(float redWarriors)
     {
-        UpdateRedPower();
+        UpdateCurrentRedPower();
         RedWarriorsText.text = ((int)redWarriors).ToString();
         UpdateNumberOfTroops(TroopColor.Red, TroopType.Warrior);
     }
