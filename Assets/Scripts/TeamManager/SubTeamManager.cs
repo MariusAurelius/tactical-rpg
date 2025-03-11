@@ -103,6 +103,19 @@ public class SubTeamManager : MonoBehaviour
         {
             AssignLeader(config.teamId, subTeam);
         }
+
+        // Assigne le leader à chaque unité dans la sous-équipe
+        foreach (var subTeam in subTeams[config.teamId])
+        {
+            Unit leader = subTeam.Find(unit => unit.isLeader);
+            foreach (var unit in subTeam)
+            {
+                if (!unit.isLeader) // Vérifie si l'unité n'est pas le leader
+                {
+                    unit.leader = leader;
+                }
+            }
+        }
     }
 
     public static void AssignLeader(int teamId, List<Unit> subTeam)

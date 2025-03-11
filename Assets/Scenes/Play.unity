@@ -2497,14 +2497,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teamId: 1
   warriorPrefab: {fileID: 5402130605783797370, guid: 2d9dcae9b380a424e8de11e0a01c7670, type: 3}
-  peasentPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
-  knightPrefab: {fileID: 104176, guid: 359a3881d0d0e4143a67b57d6482e854, type: 3}
+  peasantPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
+  archerPrefab: {fileID: 104176, guid: 359a3881d0d0e4143a67b57d6482e854, type: 3}
   spawnPoint: {fileID: 1312100707}
-  compositions:
-  - type: 1
-    count: 10
-  - type: 2
-    count: 10
   teamParent: {fileID: 1421173516}
 --- !u!1 &1332294734
 GameObject:
@@ -3391,10 +3386,12 @@ MonoBehaviour:
     teamParent: {fileID: 1421173516}
     minSubTeams: 2
     minUnitsPerSubTeam: 2
+    subTeamCount: 3
   - teamId: 2
     teamParent: {fileID: 344082331}
     minSubTeams: 2
     minUnitsPerSubTeam: 2
+    subTeamCount: 3
 --- !u!4 &1761433662
 Transform:
   m_ObjectHideFlags: 0
@@ -3561,14 +3558,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   teamId: 2
   warriorPrefab: {fileID: 172688, guid: 6724992a26d21854798810e3993415be, type: 3}
-  peasentPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
-  knightPrefab: {fileID: 142034, guid: b81ba67e44b1b174d9ef4491f146ee35, type: 3}
+  peasantPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
+  archerPrefab: {fileID: 142034, guid: b81ba67e44b1b174d9ef4491f146ee35, type: 3}
   spawnPoint: {fileID: 1936128277}
-  compositions:
-  - type: 1
-    count: 10
-  - type: 2
-    count: 10
   teamParent: {fileID: 344082331}
 --- !u!1 &1960760441
 GameObject:

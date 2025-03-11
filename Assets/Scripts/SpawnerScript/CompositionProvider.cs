@@ -1,26 +1,24 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-
-// Class to define the composition of characters
 public class CharacterComposition
 {
-    public CharacterType type;
+    public Type type; // Utilisez System.Type pour le type d'unité
     public int count;
 }
 
 [System.Serializable]
-// Class to define the composition of a team
 public class CompositionData
 {
     public List<CharacterComposition> compositions;
 }
 
-
 public class CompositionProvider : MonoBehaviour
 {
-    public CompositionData compositionData;
+    private CompositionData compositionData;
+    private const string _SAVE_FILENAME = "SavedGameSettings.json";
 
     void Start()
     {
@@ -29,15 +27,27 @@ public class CompositionProvider : MonoBehaviour
 
     void LoadCompositionData()
     {
-        // Directly define the composition data here
-        compositionData = new CompositionData
+        // Load the game settings from the JSON file
+        GameSettings gameSettings = FileHandler.ReadFromJSON<GameSettings>(_SAVE_FILENAME);
+
+        if (gameSettings != null)
         {
-            compositions = new List<CharacterComposition>
+            // Create the composition data based on the game settings
+            compositionData = new CompositionData
             {
-                new CharacterComposition { type = CharacterType.Warrior, count = 5 },
-                new CharacterComposition { type = CharacterType.Peasent, count = 3 },
-                new CharacterComposition { type = CharacterType.Knight, count = 2 }
-            }
-        };
+                compositions = new List<CharacterComposition>
+                {
+                    new CharacterComposition { type = typeof(Peasant), count = gameSettings.BluePeasants },
+                    new CharacterComposition { type = typeof(Warrior), count = gameSettings.BlueWarriors },
+                    new CharacterComposition { type = typeof(Archer), count = gameSettings.BlueArchers }
+                }
+            };
+
+            Debug.Log("Composition data loaded successfully.");
+        }
+        else
+        {
+            Debug.LogError("Failed to load composition data. JSON file not found or invalid.");
+        }
     }
 }
