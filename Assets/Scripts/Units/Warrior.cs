@@ -1,7 +1,7 @@
 using UnityEngine;
 using AgentScript;
 
-public class Warrior : MonoBehaviour
+public class Warrior : Unit
 {
     Warrior()
     {
