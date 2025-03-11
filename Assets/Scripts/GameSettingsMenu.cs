@@ -16,54 +16,90 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     private const string _SAVE_FILENAME = "SavedGameSettings.json";
 
-    // POUR L'INSTANT CETTE SCENE N'A QUE LE NOMBRE DE TROUPES ET PAS LE NOMBRES DE TROUPES PAR TYPE D'UNITE. 
-
     private enum TroopColor
     {
         Blue,
         Red
     }
 
+    private enum TroopType
+    {
+        None,
+        Peasant,
+        Archer, 
+        Warrior
+    }
+
     // UI components to set the game settings
 
     // blue troops
-    [SerializeField] private TMP_Text BlueTroopsText;
-    [SerializeField] private Slider BlueTroopsSlider;
-    [SerializeField] private Toggle RandomizeBlueTroopsToggle;
-    [SerializeField] private TMP_Text MinBlueTroopsText;
-    [SerializeField] private TMP_Text MaxBlueTroopsText;
+    [SerializeField] private TMP_Text BlueMaxPowerText;
+    [SerializeField] private Slider BlueMaxPowerSlider;
+
+    [SerializeField] private Toggle RandomizeBlueCompositionToggle;
+
+    [SerializeField] private TMP_Text BluePeasantsText;
+    [SerializeField] private Slider BluePeasantsSlider;
+
+    [SerializeField] private TMP_Text BlueWarriorsText;
+    [SerializeField] private Slider BlueWarriorsSlider;
+
+    [SerializeField] private TMP_Text BlueArchersText;
+    [SerializeField] private Slider BlueArchersSlider;
+
 
     // red troops
-    [SerializeField] private TMP_Text RedTroopsText;
-    [SerializeField] private Slider RedTroopsSlider;
-    [SerializeField] private Toggle RandomizeRedTroopsToggle;
-    [SerializeField] private TMP_Text MinRedTroopsText;
-    [SerializeField] private TMP_Text MaxRedTroopsText;
+    [SerializeField] private TMP_Text RedMaxPowerText;
+    [SerializeField] private Slider RedMaxPowerSlider;
 
+    [SerializeField] private Toggle RandomizeRedCompositionToggle;
 
-    // Slider colors : when toggling Randomize number of troops, the text and slider will toggle to gray or back to their original color. 
-    private Color originalBlueTroopsSliderHandleColor;
-    private Color originalBlueTroopsSliderFillColor;
+    [SerializeField] private TMP_Text RedPeasantsText;
+    [SerializeField] private Slider RedPeasantsSlider;
 
-    private Color originalRedTroopsSliderHandleColor;
-    private Color originalRedTroopsSliderFillColor;
+    [SerializeField] private TMP_Text RedWarriorsText;
+    [SerializeField] private Slider RedWarriorsSlider;
+
+    [SerializeField] private TMP_Text RedArchersText;
+    [SerializeField] private Slider RedArchersSlider;
 
 
     [SerializeField] private TMP_Dropdown MapDropdown;
+
+    /// <summary>
+    /// The current combined power of all the troops of this color, incremented / decremented when the number of troops of a type is 
+    /// incremented / decremented.
+    /// </summary>
+    private int _bluePower, _redPower;
+
+    /// <summary>
+    /// The power of this troop type, to get from this troop's class.
+    /// </summary>
+    private int _peasantPower, _warriorPower, _archerPower;
 
     private GameSettings _gameSettings;
 
     private void Start()
     {
+        Debug.Log("starting");
+        _peasantPower = 5;
+        _archerPower = 7;
+        _warriorPower = 10; // replace with class value
+
         _gameSettings = new();
 
-        originalBlueTroopsSliderHandleColor = GetSliderHandleColor(BlueTroopsSlider);
-        originalBlueTroopsSliderFillColor = GetSliderFillColor(BlueTroopsSlider);
-        originalRedTroopsSliderHandleColor = GetSliderHandleColor(RedTroopsSlider);
-        originalRedTroopsSliderFillColor = GetSliderFillColor(RedTroopsSlider);
+        Debug.Log("gamesettings created");
         LoadSavedGameSettings();
+        Debug.Log("gamesettings loaded");
         UpdateGameSettingsUI();
+        Debug.Log("gamesettings ui updated");
 
+        _bluePower = _peasantPower * _gameSettings.BluePeasants + _archerPower * _gameSettings.BlueArchers + _warriorPower * _gameSettings.BlueWarriors;
+        _redPower = _peasantPower * _gameSettings.RedPeasants + _archerPower * _gameSettings.RedArchers + _warriorPower * _gameSettings.RedWarriors;
+
+        UpdateNumberOfTroops(TroopColor.Blue);
+        UpdateNumberOfTroops(TroopColor.Red);
+        Debug.Log("end start");
     }
 
     /// <summary>
@@ -76,30 +112,6 @@ public class GameSettingsMenu : MonoBehaviour
         ScenesManager.Instance.LoadMainMenu();
     }
 
-    public Color GetSliderFillColor(Slider slider)
-    {
-        Image fillImage = slider.fillRect.GetComponent<Image>();
-        return fillImage.color;
-    }
-
-    public Color GetSliderHandleColor(Slider slider)
-    {
-        return slider.colors.normalColor;
-    }
-
-    private void SetSliderFillColor(Slider slider, Color newColor)
-    {
-        Image fillImage = slider.fillRect.GetComponent<Image>();
-        fillImage.color = newColor;
-    }
-
-    private void SetSliderHandleColor(Slider slider, Color newColor)
-    {
-        var sliderColors = slider.colors;
-        sliderColors.normalColor = newColor;
-        slider.colors = sliderColors;
-    }
-
 
     // functions used to update slider and text values, used by the functions that are called on +/- button click
 
@@ -108,38 +120,54 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     /// <param name="slider">Slider to change the value of.</param>
     /// <param name="text">TMP_Text showing the current int value.</param>
-    private void IncreaseValue(Slider slider, TMP_Text text)
+    /// <returns><c>True</c> if successfully incremented the value, else <c>False</c>.</returns>
+    private bool IncreaseValue(Slider slider, TMP_Text text)
     {
-        if (slider.value > 49) // cap at 50
+        if (slider.value > slider.maxValue - 1)
         {
-            return;
+            return false;
         }
 
-        slider.value += 1f;
+        slider.SetValueWithoutNotify(slider.value + 1f);
 
         int value = (int)slider.value;
 
         text.text = value.ToString();
+
+        return true;
+    }
+
+    /// <summary>
+    /// Sets the value of the slider and text with <c><paramref name="value"/></c>, without triggering any other functions.
+    /// </summary>
+    private void SetValue(Slider slider, TMP_Text text, float value) {
+        slider.SetValueWithoutNotify(value);
+        text.text = value.ToString();
+
     }
 
     /// <summary>
     /// Increases the value of the text by 1.
     /// </summary>
     /// <param name="text">TMP_Text showing the current value.</param>
-    private void IncreaseValue(TMP_Text text)
+    /// <returns><c>True</c> if successfully incremented the value, else <c>False</c>.</returns>
+    private bool IncreaseValue(TMP_Text text)
     {
         string txt = text.text.Trim();
         if (int.TryParse(txt, out int value))
         {
-            if (value <= 49)
+            if (value <= 99) // cap was at 100 : INVALID NOW
             {
                 value++;
+                text.text = value.ToString();
+                return true;
             }
-            text.text = value.ToString();
+            return false;
         }
         else
         {
             Debug.LogError("Error: the text object did not contain an integer.");
+            return false;
         }
     }
 
@@ -148,74 +176,341 @@ public class GameSettingsMenu : MonoBehaviour
     /// </summary>
     /// <param name="slider">Slider to change the value of.</param>
     /// <param name="text">TMP_Text showing the current value.</param>
-    private void DecreaseValue(Slider slider, TMP_Text text)
+    /// <returns><c>True</c> if successfully decremented the value, else <c>False</c>.</returns>
+    private bool DecreaseValue(Slider slider, TMP_Text text)
     {
-        if (slider.value < 1)
+        if (slider.value < slider.minValue + 1)
         {
-            return;
+            return false;
         }
 
-        slider.value -= 1f;
+        slider.SetValueWithoutNotify(slider.value - 1f);
 
         int value = (int)slider.value;
 
         text.text = value.ToString();
+
+        return true;
     }
 
     /// <summary>
     /// Decreases the value of the text by 1.
     /// </summary>
     /// <param name="text">TMP_Text showing the current value.</param>
-    private void DecreaseValue(TMP_Text text)
+    /// <returns><c>True</c> if successfully decremented the value, else <c>False</c>.</returns>
+    private bool DecreaseValue(TMP_Text text)
     {
         string txt = text.text.Trim();
         if (int.TryParse(txt, out int value))
         {
-            if (value >= 1)
+            if (value >= 1) // NOT NECESSARILLY MIN OF SLIDER
             {
                 value--;
+                text.text = value.ToString();
+                return true;
             }
-            text.text = value.ToString();
+            return false;
         }
         else
         {
             Debug.LogError("Error: the text object did not contain an integer.");
+            return false;
         }
     }
 
 
+    // change specific value for blue and red max power amount (on +/- button click)
+
+    /// <summary>
+    /// Increases the blue max power by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseBlueMaxPower()
+    {
+        IncreaseValue(BlueMaxPowerSlider, BlueMaxPowerText);
+        // UpdateNumberOfTroops(TroopColor.Blue); // only necessary if decreasing troops
+    }
+
+    /// <summary>
+    /// Decreases the blue max power by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseBlueMaxPower()
+    {
+        DecreaseValue(BlueMaxPowerSlider, BlueMaxPowerText);
+        UpdateNumberOfTroops(TroopColor.Blue);
+    }
+
+    /// <summary>
+    /// Increases the red max power by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseRedMaxPower()
+    {
+        IncreaseValue(RedMaxPowerSlider, RedMaxPowerText);
+        // UpdateNumberOfTroops(TroopColor.Red); // only necessary if decreasing troops
+    }
+
+    /// <summary>
+    /// Decreases the red max power by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseRedMaxPower()
+    {
+        DecreaseValue(RedMaxPowerSlider, RedMaxPowerText);
+        UpdateNumberOfTroops(TroopColor.Red);
+    }
+
+    /// <summary>
+    /// Updates the number of troops of each type if the combined power is superior to the max power, so that the combined power
+    /// of all the troops is inferior or equal to the max power.
+    /// </summary>
+    /// <param name="troopColor">the color of the team to update the troops of.</param>
+    /// <param name="troopTypeToIgnore">if given, the troop type to avoid taking away from.</param>
+    private void UpdateNumberOfTroops(TroopColor troopColor, TroopType troopTypeToIgnore = TroopType.None)
+    {
+        switch (troopColor)
+        {
+            case TroopColor.Blue:
+                if (_bluePower > BlueMaxPowerSlider.value)
+                {
+                    var powerDiff = _bluePower - BlueMaxPowerSlider.value;
+                    while (powerDiff > 0)
+                    {
+                        if (powerDiff >= _warriorPower && troopTypeToIgnore != TroopType.Warrior && BlueWarriorsSlider.value > 0)
+                        {
+                            DecreaseBlueWarriors();
+                            Debug.Log("must decrease warriors");
+                        }
+                        else if (powerDiff >= _archerPower && troopTypeToIgnore != TroopType.Archer && BlueArchersSlider.value > 0)
+                        {
+                            DecreaseBlueArchers();
+                            Debug.Log("must decrease archers");
+                        }
+                        else if (troopTypeToIgnore != TroopType.Peasant && BluePeasantsSlider.value > 0)
+                        {
+                            DecreaseBluePeasants();
+                            Debug.Log("must decrease peasants");
+                        }
+                        if (powerDiff == _bluePower - BlueMaxPowerSlider.value) // blue power hasn't changed: can't decrease anymore 
+                                                                                // due to troop type to ignore > decrease it anyways
+                        {
+                            troopTypeToIgnore = TroopType.None;
+                            Debug.Log("undoing troop type to ignore");
+                            // break;
+                        }
+                        powerDiff = _bluePower - BlueMaxPowerSlider.value;
+                    }
+                }
+                break;
+
+            case TroopColor.Red:
+                if (_redPower > RedMaxPowerSlider.value)
+                {
+                    var powerDiff = _redPower - RedMaxPowerSlider.value;
+                    while (powerDiff > 0)
+                    {
+                        if (powerDiff >= _warriorPower && troopTypeToIgnore != TroopType.Warrior && RedWarriorsSlider.value > 0)
+                        {
+                            DecreaseRedWarriors();
+                            Debug.Log("must decrease warriors");
+                        }
+                        else if (powerDiff >= _archerPower && troopTypeToIgnore != TroopType.Archer && RedArchersSlider.value > 0)
+                        {
+                            DecreaseRedArchers();
+                            Debug.Log("must decrease archers");
+                        }
+                        else if (troopTypeToIgnore != TroopType.Peasant && RedPeasantsSlider.value > 0)
+                        {
+                            DecreaseRedPeasants();
+                            Debug.Log("must decrease peasants");
+                        }
+                        if (powerDiff == _redPower - RedMaxPowerSlider.value) // red power hasn't changed: can't decrease anymore 
+                                                                                // due to troop type to ignore > decrease it anyways
+                        {
+                            troopTypeToIgnore = TroopType.None;
+                            // break;
+                            Debug.Log("undoing troop type to ignore");
+                        }
+                        powerDiff = _redPower - RedMaxPowerSlider.value;
+                    }
+                }
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Updates the value of <c>_bluePower</c> based on the slider values.
+    /// </summary>
+    private void UpdateBluePower() {
+        _bluePower =(int) (_peasantPower * BluePeasantsSlider.value + _archerPower * BlueArchersSlider.value + _warriorPower * BlueWarriorsSlider.value);
+    }
+
+    /// <summary>
+    /// Updates the value of <c>_redPower</c> based on the slider values.
+    /// </summary>
+    private void UpdateRedPower() {
+        _redPower =(int) (_peasantPower * RedPeasantsSlider.value + _archerPower * RedArchersSlider.value + _warriorPower * RedWarriorsSlider.value);
+    }
+
     // change specific value for blue and red troops amount (on +/- button click)
 
     /// <summary>
-    /// Increases the number of blue troops by 1, and updates the corresponding UI.
+    /// Increases the number of blue peasants by 1, and updates the corresponding UI.
     /// </summary>
-    public void IncreaseBlueTroops()
+    public void IncreaseBluePeasants()
     {
-        IncreaseValue(BlueTroopsSlider, BlueTroopsText);
+        if (_bluePower + _peasantPower <= BlueMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(BluePeasantsSlider, BluePeasantsText);
+            if (increased)
+            {
+                _bluePower += _peasantPower;
+            }
+        }
     }
 
     /// <summary>
-    /// Decreases the number of blue troops by 1, and updates the corresponding UI.
+    /// Decreases the number of blue peasants by 1, and updates the corresponding UI.
     /// </summary>
-    public void DecreaseBlueTroops()
+    public void DecreaseBluePeasants()
     {
-        DecreaseValue(BlueTroopsSlider, BlueTroopsText);
+        var decreased = DecreaseValue(BluePeasantsSlider, BluePeasantsText);
+        if (decreased)
+        {
+            _bluePower -= _peasantPower;
+        }
     }
 
     /// <summary>
-    /// Increases the number of red troops by 1, and updates the corresponding UI.
+    /// Increases the number of red peasants by 1, and updates the corresponding UI.
     /// </summary>
-    public void IncreaseRedTroops()
+    public void IncreaseRedPeasants()
     {
-        IncreaseValue(RedTroopsSlider, RedTroopsText);
+        if (_redPower + _peasantPower <= RedMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(RedPeasantsSlider, RedPeasantsText);
+            if (increased)
+            {
+                _redPower += _peasantPower;
+            }
+        }
     }
 
     /// <summary>
-    /// Decreases the number of red troops by 1, and updates the corresponding UI.
+    /// Decreases the number of red peasants by 1, and updates the corresponding UI.
     /// </summary>
-    public void DecreaseRedTroops()
+    public void DecreaseRedPeasants()
     {
-        DecreaseValue(RedTroopsSlider, RedTroopsText);
+        var decreased = DecreaseValue(RedPeasantsSlider, RedPeasantsText);
+        if (decreased)
+        {
+            _redPower -= _peasantPower;
+        }
+    }
+
+    /// <summary>
+    /// Increases the number of blue warriors by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseBlueWarriors()
+    {
+        if (_bluePower + _warriorPower <= BlueMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(BlueWarriorsSlider, BlueWarriorsText);
+            if (increased)
+            {
+                _bluePower += _warriorPower;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Decreases the number of blue warriors by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseBlueWarriors()
+    {
+        var decreased = DecreaseValue(BlueWarriorsSlider, BlueWarriorsText);
+        if (decreased)
+        {
+            _bluePower -= _warriorPower;
+        }
+    }
+
+    /// <summary>
+    /// Increases the number of red warriors by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseRedWarriors()
+    {
+        if (_redPower + _warriorPower <= RedMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(RedWarriorsSlider, RedWarriorsText);
+            if (increased)
+            {
+                _redPower += _warriorPower;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Decreases the number of red warriors by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseRedWarriors()
+    {
+        var decreased = DecreaseValue(RedWarriorsSlider, RedWarriorsText);
+        if (decreased)
+        {
+            _redPower -= _warriorPower;
+        }
+    }
+
+    /// <summary>
+    /// Increases the number of blue archers by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseBlueArchers()
+    {
+        if (_bluePower + _archerPower <= BlueMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(BlueArchersSlider, BlueArchersText);
+            if (increased)
+            {
+                _bluePower += _archerPower;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Decreases the number of blue archers by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseBlueArchers()
+    {
+        var decreased = DecreaseValue(BlueArchersSlider, BlueArchersText);
+        if (decreased)
+        {
+            _bluePower -= _archerPower;
+        }
+    }
+
+    /// <summary>
+    /// Increases the number of red archers by 1, and updates the corresponding UI.
+    /// </summary>
+    public void IncreaseRedArchers()
+    {
+        if (_redPower + _archerPower <= RedMaxPowerSlider.value)
+        {
+            var increased = IncreaseValue(RedArchersSlider, RedArchersText);
+            if (increased)
+            {
+                _redPower += _archerPower;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Decreases the number of red archers by 1, and updates the corresponding UI.
+    /// </summary>
+    public void DecreaseRedArchers()
+    {
+        var decreased = DecreaseValue(RedArchersSlider, RedArchersText);
+        if (decreased)
+        {
+            _redPower -= _archerPower;
+        }
     }
 
 
@@ -239,226 +534,123 @@ public class GameSettingsMenu : MonoBehaviour
         return false;
     }
 
-
-    // change Min and Max Blue Troops (on +/- button click)
-
-    public void IncreaseMinBlueTroops()
-    {
-        if (IsInferiorEqualTo(MaxBlueTroopsText.text, MinBlueTroopsText.text)) // cant increase min if min >= max <=> max <= min
-        {
-            return;
-        }
-        IncreaseValue(MinBlueTroopsText);
-    }
-
-    public void DecreaseMinBlueTroops()
-    {
-        DecreaseValue(MinBlueTroopsText);
-    }
-
-    public void IncreaseMaxBlueTroops()
-    {
-        IncreaseValue(MaxBlueTroopsText);
-    }
-
-    public void DecreaseMaxBlueTroops()
-    {
-        if (IsInferiorEqualTo(MaxBlueTroopsText.text, MinBlueTroopsText.text)) // cant decrease if max <= min
-        {
-            return;
-        }
-        DecreaseValue(MaxBlueTroopsText);
-    }
-
-
-    // change Min and Max Red Troops (on +/- button click)
-
-    public void IncreaseMinRedTroops()
-    {
-        if (IsInferiorEqualTo(MaxRedTroopsText.text, MinRedTroopsText.text)) // cant increase min if min >= max <=> max <= min
-        {
-            return;
-        }
-        IncreaseValue(MinRedTroopsText);
-    }
-
-    public void DecreaseMinRedTroops()
-    {
-        DecreaseValue(MinRedTroopsText);
-    }
-
-    public void IncreaseMaxRedTroops()
-    {
-        IncreaseValue(MaxRedTroopsText);
-    }
-
-    public void DecreaseMaxRedTroops()
-    {
-        if (IsInferiorEqualTo(MaxRedTroopsText.text, MinRedTroopsText.text)) // cant decrease if max <= min
-        {
-            return;
-        }
-        DecreaseValue(MaxRedTroopsText);
-    }
-
-
-    // update number of troops text via slider
+    
+    // update values via slider
 
     /// <summary>
-    /// Updates the number of blue troops text via the slider.
+    /// Updates the blue max power and its text via the slider.
     /// </summary>
-    public void UpdateBlueTroopsText(float blueTroops)
+    public void UpdateBlueMaxPower(float blueMaxPower)
     {
-        BlueTroopsText.text = ((int)blueTroops).ToString();
+        UpdateNumberOfTroops(TroopColor.Blue);
+        BlueMaxPowerText.text = ((int)blueMaxPower).ToString();
     }
 
     /// <summary>
-    /// Updates the number of red troops text via the slider.
+    /// Updates the red max power and its text via the slider.
     /// </summary>
-    public void UpdateRedTroopsText(float redTroops)
+    public void UpdateRedMaxPower(float redMaxPower)
     {
-        RedTroopsText.text = ((int)redTroops).ToString();
+        UpdateNumberOfTroops(TroopColor.Red);
+        RedMaxPowerText.text = ((int)redMaxPower).ToString();
     }
 
-
-    // change UI appearance based on whether randomize is toggled on/off
-
     /// <summary>
-    /// "Minimizes" the slider and text appearance by changing their colors to gray, OR the Min and Max texts 
-    /// if <c><paramref name="randomize"/></c> is true.
+    /// Updates the amount of blue peasants and its text via the slider.
     /// </summary>
-    /// <param name="troopColor">TroopColor.Blue or TroopColor.Red</param>
-    /// <param name="randomize"> True if the 'randomize' part must be minimized, else false.</param>
-    private void MinimizeObjectAppearance(TroopColor troopColor, bool randomize)
+    public void UpdateBluePeasants(float bluePeasants)
     {
-        if (troopColor == TroopColor.Blue)
-        {
-            if (randomize) // randomize part of BlueTroops to be minimized
-            {
-                MinBlueTroopsText.color = Color.gray;
-                MaxBlueTroopsText.color = Color.gray;
-            }
-            else // specific value part (text and slider) to be minimized: apply gray filter to slider and text
-            {
-                SetSliderHandleColor(BlueTroopsSlider, Color.gray);
-                SetSliderFillColor(BlueTroopsSlider, Color.gray);
-
-                BlueTroopsText.color = Color.gray;
-            }
-        }
-        else if (troopColor == TroopColor.Red)
-        {
-            if (randomize) // randomize part of RedTroops to be minimized
-            {
-                MinRedTroopsText.color = Color.gray;
-                MaxRedTroopsText.color = Color.gray;
-            }
-            else // specific value part (text and slider) to be minimized: apply gray filter to slider and text
-            {
-                SetSliderHandleColor(RedTroopsSlider, Color.gray);
-                SetSliderFillColor(RedTroopsSlider, Color.gray);
-
-                RedTroopsText.color = Color.gray;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Wrong parameter passed");
-        }
+        UpdateBluePower();
+        BluePeasantsText.text = ((int)bluePeasants).ToString();
+        UpdateNumberOfTroops(TroopColor.Blue, TroopType.Peasant);
     }
 
     /// <summary>
-    /// "Maximizes" the slider and text appearance by reverting their colors back to their original ones, OR the Min and Max texts 
-    /// if <c><paramref name="randomize"/></c> is true.
+    /// Updates the amount of red peasants and its text via the slider.
     /// </summary>
-    /// <param name="troopColor">TroopColor.Blue or TroopColor.Red</param>
-    /// <param name="randomize"> True if the 'randomize' part must be maximized, else false.</param>
-    private void MaximizeObjectAppearance(TroopColor troopColor, bool randomize)
+    public void UpdateRedPeasants(float redPeasants)
     {
-        if (troopColor == TroopColor.Blue)
-        {
-            if (randomize) // randomize part of BlueTroops to be maximized
-            {
-                MinBlueTroopsText.color = Color.white;
-                MaxBlueTroopsText.color = Color.white;
-            }
-            else // specific value part (text and slider) to be maximized: restore original colors
-            {
-                SetSliderHandleColor(BlueTroopsSlider, originalBlueTroopsSliderHandleColor);
-                SetSliderFillColor(BlueTroopsSlider, originalBlueTroopsSliderFillColor);
-
-                BlueTroopsText.color = Color.white;
-            }
-        }
-        else if (troopColor == TroopColor.Red)
-        {
-
-            if (randomize) // randomize part of RedTroops to be maximized
-            {
-                MinRedTroopsText.color = Color.white;
-                MaxRedTroopsText.color = Color.white;
-            }
-            else // specific value part (text and slider) to be maximized: restore original colors
-            {
-                SetSliderHandleColor(RedTroopsSlider, originalRedTroopsSliderHandleColor);
-                SetSliderFillColor(RedTroopsSlider, originalRedTroopsSliderFillColor);
-
-                RedTroopsText.color = Color.white;
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Wrong parameter passed");
-        }
+        UpdateRedPower();
+        RedPeasantsText.text = ((int)redPeasants).ToString();
+        UpdateNumberOfTroops(TroopColor.Red, TroopType.Peasant);
     }
 
     /// <summary>
-    /// Called when the 'Randomize blue troops' checkbox is toggled: minimizes / maximizes the appropriate UI elements.
+    /// Updates the amount of blue archers and its text via the slider.
+    /// </summary>
+    public void UpdateBlueArchers(float blueArchers)
+    {
+        UpdateBluePower();
+        BlueArchersText.text = ((int)blueArchers).ToString();
+        UpdateNumberOfTroops(TroopColor.Blue, TroopType.Archer);
+    }
+
+    /// <summary>
+    /// Updates the amount of red archers and its text via the slider.
+    /// </summary>
+    public void UpdateRedArchers(float redArchers)
+    {
+        UpdateRedPower();
+        RedArchersText.text = ((int)redArchers).ToString();
+        UpdateNumberOfTroops(TroopColor.Red, TroopType.Archer);
+    }
+
+    /// <summary>
+    /// Updates the amount of blue warriors and its text via the slider.
+    /// </summary>
+    public void UpdateBlueWarriors(float blueWarriors)
+    {
+        UpdateBluePower();
+        BlueWarriorsText.text = ((int)blueWarriors).ToString();
+        UpdateNumberOfTroops(TroopColor.Blue, TroopType.Warrior);
+    }
+
+    /// <summary>
+    /// Updates the amount of red warriors and its text via the slider.
+    /// </summary>
+    public void UpdateRedWarriors(float redWarriors)
+    {
+        UpdateRedPower();
+        RedWarriorsText.text = ((int)redWarriors).ToString();
+        UpdateNumberOfTroops(TroopColor.Red, TroopType.Warrior);
+    }
+
+
+    /// <summary>
+    /// Called when the 'Randomize blue composition' checkbox is toggled: randomizes the number of blue peasants, warriors, and archers.
     /// </summary>
     /// <param name="randomize">The checkbox state after toggling.</param>
-    public void OnRandomizeBlueTroopsToggle(bool randomize)
+    public void OnRandomizeBlueCompositionToggle(bool randomize)
     {
-        if (randomize == true) // minimize the specific value UI elements, maximize the random value UI elements.
+        if (randomize == true)
         {
-            MinimizeObjectAppearance(TroopColor.Blue, false);
-            MaximizeObjectAppearance(TroopColor.Blue, true);
-        }
-        else // maximize the specific value UI elements, minimize the random value UI elements.
-        {
-            MaximizeObjectAppearance(TroopColor.Blue, false);
-            MinimizeObjectAppearance(TroopColor.Blue, true);
+            // randomize # of blue peasants, warriors, and archers
         }
     }
 
     /// <summary>
-    /// Called when the 'Randomize red troops' checkbox is toggled: minimizes / maximizes the appropriate UI elements.
+    /// Called when the 'Randomize red composition' checkbox is toggled: randomizes the number of red peasants, warriors, and archers.
     /// </summary>
     /// <param name="randomize">The checkbox state after toggling.</param>
-    public void OnRandomizeRedTroopsToggle(bool randomize)
+    public void OnRandomizeRedCompositionToggle(bool randomize)
     {
-        if (randomize == true) // minimize the specific value UI elements, maximize the random value UI elements.
+        if (randomize == true)
         {
-            MinimizeObjectAppearance(TroopColor.Red, false);
-            MaximizeObjectAppearance(TroopColor.Red, true);
-        }
-        else // maximize the specific value UI elements, minimize the random value UI elements.
-        {
-            MaximizeObjectAppearance(TroopColor.Red, false);
-            MinimizeObjectAppearance(TroopColor.Red, true);
+            // randomize # of red peasants, warriors, and archers
         }
     }
 
 
     // functions for getting the values from the UI components
 
-    public int GetBlueTroops()
+    public int GetBlueMaxPower()
     {
-        return (int)BlueTroopsSlider.value;
+        return (int)BlueMaxPowerSlider.value;
     }
 
-    public int GetRedTroops()
+    public int GetRedMaxPower()
     {
-        return (int)RedTroopsSlider.value;
+        return (int)RedMaxPowerSlider.value;
     }
 
     /// <summary>
@@ -480,34 +672,44 @@ public class GameSettingsMenu : MonoBehaviour
         }
     }
 
-    public int GetMinBlueTroops()
+    public int GetBluePeasants()
     {
-        return GetIntFromText(MinBlueTroopsText.text, 3);
+        return (int)BluePeasantsSlider.value;
     }
 
-    public int GetMaxBlueTroops()
+    public int GetBlueArchers()
     {
-        return GetIntFromText(MaxBlueTroopsText.text, 7);
+        return (int)BlueArchersSlider.value;
     }
 
-    public int GetMinRedTroops()
+    public int GetBlueWarriors()
     {
-        return GetIntFromText(MinRedTroopsText.text, 3);
+        return (int)BlueWarriorsSlider.value;
     }
 
-    public int GetMaxRedTroops()
+    public int GetRedPeasants()
     {
-        return GetIntFromText(MaxRedTroopsText.text, 7);
+        return (int)RedPeasantsSlider.value;
     }
 
-    public bool GetRandomizeBlueTroops()
+    public int GetRedArchers()
     {
-        return RandomizeBlueTroopsToggle.isOn;
+        return (int)RedArchersSlider.value;
+    }
+    
+    public int GetRedWarriors()
+    {
+        return (int)RedWarriorsSlider.value;
     }
 
-    public bool GetRandomizeRedTroops()
+    public bool GetRandomizeBlueComposition()
     {
-        return RandomizeRedTroopsToggle.isOn;
+        return RandomizeBlueCompositionToggle.isOn;
+    }
+
+    public bool GetRandomizeRedComposition()
+    {
+        return RandomizeRedCompositionToggle.isOn;
     }
 
     public string GetMapName()
@@ -525,14 +727,18 @@ public class GameSettingsMenu : MonoBehaviour
     {
         _gameSettings ??= new(); // same as - if game settings == null: game settings = new()
 
-        _gameSettings.BlueTroops = GetBlueTroops();
-        _gameSettings.MinBlueTroops = GetMinBlueTroops();
-        _gameSettings.MaxBlueTroops = GetMaxBlueTroops();
-        _gameSettings.RedTroops = GetRedTroops();
-        _gameSettings.MinRedTroops = GetMinRedTroops();
-        _gameSettings.MaxRedTroops = GetMaxRedTroops();
-        _gameSettings.RandomizeBlueTroops = GetRandomizeBlueTroops();
-        _gameSettings.RandomizeRedTroops = GetRandomizeRedTroops();
+        _gameSettings.BlueMaxPower = GetBlueMaxPower();
+        _gameSettings.BluePeasants = GetBluePeasants();
+        _gameSettings.BlueArchers = GetBlueArchers();
+        _gameSettings.BlueWarriors = GetBlueWarriors();
+        _gameSettings.RandomizeBlueComposition = GetRandomizeBlueComposition();
+
+        _gameSettings.RedMaxPower = GetRedMaxPower();
+        _gameSettings.RedPeasants = GetRedPeasants();
+        _gameSettings.RedArchers = GetRedArchers();
+        _gameSettings.RedWarriors = GetRedWarriors();
+        _gameSettings.RandomizeRedComposition = GetRandomizeRedComposition();
+        
         _gameSettings.MapName = GetMapName();
     }
 
@@ -580,18 +786,45 @@ public class GameSettingsMenu : MonoBehaviour
 
     // functions for setting UI components' values from the saved game settings
 
-    private void SetBlueTroopsUI()
+    private void SetBlueMaxPowerUI()
     {
-        BlueTroopsSlider.value = _gameSettings.BlueTroops;
-        BlueTroopsText.text = _gameSettings.BlueTroops.ToString();
+        SetValue(BlueMaxPowerSlider, BlueMaxPowerText, _gameSettings.BlueMaxPower);
     }
 
-    private void SetRedTroopsUI()
+    private void SetRedMaxPowerUI()
     {
-        RedTroopsSlider.value = _gameSettings.RedTroops;
-        RedTroopsText.text = _gameSettings.RedTroops.ToString();
+        SetValue(RedMaxPowerSlider, RedMaxPowerText, _gameSettings.RedMaxPower);
     }
 
+    private void SetBluePeasantsUI()
+    {
+        SetValue(BluePeasantsSlider, BluePeasantsText, _gameSettings.BluePeasants);
+    }
+
+    private void SetRedPeasantsUI()
+    {
+        SetValue(RedPeasantsSlider, RedPeasantsText, _gameSettings.RedPeasants);
+    }
+
+    private void SetBlueArchersUI()
+    {
+        SetValue(BlueArchersSlider, BlueArchersText, _gameSettings.BlueArchers);
+    }
+
+    private void SetRedArchersUI()
+    {
+        SetValue(RedArchersSlider, RedArchersText, _gameSettings.RedArchers);
+    }
+
+    private void SetBlueWarriorsUI()
+    {
+        SetValue(BlueWarriorsSlider, BlueWarriorsText, _gameSettings.BlueWarriors);
+    }
+
+    private void SetRedWarriorsUI()
+    {
+        SetValue(RedWarriorsSlider, RedWarriorsText, _gameSettings.RedWarriors);
+    }
 
     /// <summary>
     /// Updates the UI elements of the Game Settings Menu scene with the loaded game settings.
@@ -601,16 +834,18 @@ public class GameSettingsMenu : MonoBehaviour
         if (_gameSettings != null)
         {
             _gameSettings.Log();
-            SetBlueTroopsUI();
-            MinBlueTroopsText.text = _gameSettings.MinBlueTroops.ToString();
-            MaxBlueTroopsText.text = _gameSettings.MaxBlueTroops.ToString();
+            
+            SetBlueMaxPowerUI();
+            SetBluePeasantsUI();
+            SetBlueArchersUI();
+            SetBlueWarriorsUI();
+            RandomizeBlueCompositionToggle.isOn = _gameSettings.RandomizeBlueComposition;
 
-            SetRedTroopsUI();
-            MinRedTroopsText.text = _gameSettings.MinRedTroops.ToString();
-            MaxRedTroopsText.text = _gameSettings.MaxRedTroops.ToString();
-
-            RandomizeBlueTroopsToggle.isOn = _gameSettings.RandomizeBlueTroops;
-            RandomizeRedTroopsToggle.isOn = _gameSettings.RandomizeRedTroops;
+            SetRedMaxPowerUI();
+            SetRedPeasantsUI();
+            SetRedArchersUI();
+            SetRedWarriorsUI();
+            RandomizeRedCompositionToggle.isOn = _gameSettings.RandomizeRedComposition;
 
             MapDropdown.value = MapDropdown.options.FindIndex(option => option.text == _gameSettings.MapName);
         }

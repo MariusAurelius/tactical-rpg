@@ -9,14 +9,22 @@ public class GameSettings
 {
 
     /// <summary>
-    /// The number of troops to load into the game.
+    /// The combined maximum power of all the troops of this color.
     /// </summary>
-    public int BlueTroops, MinBlueTroops, MaxBlueTroops, RedTroops, MinRedTroops, MaxRedTroops;
+    public int BlueMaxPower, RedMaxPower;
 
     /// <summary>
-    /// Should the number of troops be randomized?
+    /// The number of troops of this type and color to load into the game.
     /// </summary>
-    public bool RandomizeBlueTroops, RandomizeRedTroops;
+    public int BluePeasants, BlueWarriors, BlueArchers, RedPeasants, RedWarriors, RedArchers;
+
+    /// <summary>
+    /// Should the number of troops of each type be randomized?
+    /// </summary>
+    /// <remarks>
+    /// If random, the combined power of all the troops will be inferior or equal to the Max Power.
+    /// </remarks>
+    public bool RandomizeBlueComposition, RandomizeRedComposition;
     
     /// <summary>
     /// The name of the game map to load.
@@ -24,22 +32,23 @@ public class GameSettings
     public string MapName;
 
     /// <summary>
-    /// Initialize all the data members.
+    /// Initializes all the data members.
     /// </summary>
     public GameSettings()
     {
-        BlueTroops = RedTroops = 5;
-        MinBlueTroops = MinRedTroops = 3;
-        MaxBlueTroops = MaxRedTroops = 7;
-        RandomizeBlueTroops = RandomizeRedTroops = false;
+        BlueMaxPower = RedMaxPower = 26;
+        BluePeasants = RedPeasants = 3;
+        BlueWarriors = RedWarriors = 7;
+        BlueArchers = RedArchers = 5;
+        RandomizeBlueComposition = RandomizeRedComposition = false;
         MapName = "Plane";
     }
 
     /// <summary>
-    /// Log all of the fields to the console.
+    /// Logs all of the fields to the console.
     /// </summary>
     public void Log()
     {
-        Debug.Log($"Map: {MapName} | Number of blue troops: {BlueTroops} | min number of blue troops: {MinBlueTroops} | max number of blue troops: {MaxBlueTroops} | Number of red troops: {RedTroops} | min number of red troops: {MinRedTroops} | max number of red troops: {MaxRedTroops} | randomize number of blue troops: {RandomizeBlueTroops} | randomize number of red troops: {RandomizeRedTroops}");
+        Debug.Log($"Map: {MapName} | Blue max power: {BlueMaxPower} | Red max power: {RedMaxPower} | Number of blue peasants: {BluePeasants} | Number of blue warriors: {BlueWarriors} | Number of blue archers: {BlueArchers} | Number of red peasants: {RedPeasants} | Number of red warriors: {RedWarriors} | Number of red archers: {RedArchers} | randomize blue composition: {RandomizeBlueComposition} | randomize red composition: {RandomizeRedComposition}");
     }
 }
