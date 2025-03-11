@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic; 
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -18,11 +18,13 @@ namespace AgentScript
         }
 
         public bool isLeader;
+        public int team;
         public int maxHp = 0;
         public int currentHp = 0;
         public int atk;
         public int atkSpeed;
         public int atkReach;
+        private float attackCooldown = 0f;
 
         public float movSpeed;
 
@@ -34,6 +36,13 @@ namespace AgentScript
 
         //Agent
         private NavMeshAgent agent;
+        private GameObject floor = null;
+        private Bounds bnd;
+
+        [Header("Animations")]
+        [SerializeField]
+        protected Animator _animator;
+
 
         public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
         public GameObject goal;
@@ -45,26 +54,37 @@ namespace AgentScript
         {
 
             agent = this.GetComponent<NavMeshAgent>();
+            floor = GameObject.Find("floor");
+            bnd = floor.GetComponent<Renderer>().bounds;
             Search();
 
             leader = GetLeader();
             isLeader = (leader == this);
+
         }
 
         void Update()
         {
-            if (this.currentHp <= 0)
-            {
-                Destroy(this);
-            }
+
             if (this.currentEnemy == null)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
             }
+            Debug.Log(currentBehaviour);
             switch (currentBehaviour)
             {
                 case BEHAVIOURS.WANDERING:
-                    Search(); break;
+                    if (agent.remainingDistance == 0)
+                    {
+                        Search();
+                    }
+                    Unit enemy = SeeEnemy();
+                    if (enemy != null)
+                    {
+                        currentEnemy = enemy;
+                        currentBehaviour = BEHAVIOURS.GOING;
+                    }
+                    break;
                 case BEHAVIOURS.GOING:
                     Go(); break;
                 case BEHAVIOURS.ATTACKING:
@@ -76,31 +96,94 @@ namespace AgentScript
 
         void Attack()
         {
-            this.currentEnemy.currentHp = this.currentEnemy.currentHp - this.atk;
+            if (currentEnemy != null)
+            {
+                if (attackCooldown <= 0f)
+                {
+                    currentEnemy.ReduceHp(this.atk);
+                    attackCooldown = 1f / atkSpeed;  // Cooldown based on attack speed
+                }
+                else
+                {
+                    attackCooldown -= Time.deltaTime;
+                }
+            }
+            else
+            {
+                currentBehaviour = BEHAVIOURS.WANDERING;
+            }
+        }
+
+        void SetRandomDestination()
+        {
+            float rx = UnityEngine.Random.Range(-50, 50);
+            float rz = UnityEngine.Random.Range(-50, 50);
+            Vector3 moveto = new Vector3(rx, this.transform.position.y, rz);
+            agent.SetDestination(moveto);
+        }
+
+        Unit SeeEnemy()
+        {
+            RaycastHit raycastInfo;
+            Vector3 rayToTarget = agent.destination - agent.transform.position;
+            if (Physics.Raycast(this.transform.position, rayToTarget, out raycastInfo))
+            {
+                if (raycastInfo.collider != null)
+                {
+                    Unit unit = raycastInfo.collider.GetComponent<Unit>();
+                    if (unit != null)
+                    {
+                        return unit;
+                    }
+                }
+            }
+            return null;
+
         }
 
         void Search()
         {
-            float rx = UnityEngine.Random.Range(-50, -50);
-            float rz = UnityEngine.Random.Range(-50, -50);
-            Vector3 moveto = new Vector3(rx, this.transform.position.y, rz);
-            agent.SetDestination(moveto);
+            if (agent.remainingDistance < 0.3f)
+            {
+                SetRandomDestination();
+            }
+
+            // Update the animator with the current speed
+            _animator.SetFloat("speed", agent.velocity.magnitude);
         }
 
 
         void Go()
         {
-            if(currentEnemy != null)
+            if (currentEnemy != null)
             {
                 agent.SetDestination(currentEnemy.transform.position);
-            }
-            if (agent.remainingDistance < this.atkReach)
-            {
-                this.currentBehaviour = BEHAVIOURS.ATTACKING;
+
+                Debug.Log(agent.remainingDistance < this.atkReach);
+                if (agent.remainingDistance < this.atkReach)
+                {
+
+                    currentEnemy.currentEnemy = this;
+                    if (currentEnemy.currentBehaviour != BEHAVIOURS.ATTACKING)
+                    {
+
+                        currentEnemy.currentBehaviour = BEHAVIOURS.GOING;
+                    }
+                    this.currentBehaviour = BEHAVIOURS.ATTACKING;
+                }
             }
 
         }
 
+        void ReduceHp(int dmgTaken)
+        {
+            this.currentHp -= dmgTaken;
+            if (this.currentHp <= 0)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+        }
         public int GetHp()
         {
             if (hasBeenAttacked)
