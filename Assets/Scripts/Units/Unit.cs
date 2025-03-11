@@ -34,12 +34,6 @@ namespace AgentScript
 
         //Agent
         private NavMeshAgent agent;
-        private GameObject floor = null;
-        private Bounds bnd;
-
-        [Header("Animations")]
-        [SerializeField]
-        protected Animator _animator;
 
         public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
         public GameObject goal;
@@ -51,8 +45,6 @@ namespace AgentScript
         {
 
             agent = this.GetComponent<NavMeshAgent>();
-            floor = GameObject.Find("floor");
-            bnd = floor.GetComponent<Renderer>().bounds;
             Search();
 
             leader = GetLeader();
@@ -87,24 +79,14 @@ namespace AgentScript
             this.currentEnemy.currentHp = this.currentEnemy.currentHp - this.atk;
         }
 
-        void SetRandomDestination()
+        void Search()
         {
-            float rx = UnityEngine.Random.Range(bnd.min.x, bnd.max.x);
-            float rz = UnityEngine.Random.Range(bnd.min.z, bnd.max.z);
+            float rx = UnityEngine.Random.Range(-50, -50);
+            float rz = UnityEngine.Random.Range(-50, -50);
             Vector3 moveto = new Vector3(rx, this.transform.position.y, rz);
             agent.SetDestination(moveto);
         }
 
-        void Search()
-        {
-            if (agent.remainingDistance < 0.3f)
-            {
-                SetRandomDestination();
-            }
-
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
-        }
 
         void Go()
         {
@@ -116,9 +98,6 @@ namespace AgentScript
             {
                 this.currentBehaviour = BEHAVIOURS.ATTACKING;
             }
-
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
 
         }
 
