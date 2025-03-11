@@ -24,6 +24,7 @@ namespace AgentScript
         public int atk;
         public int atkSpeed;
         public int atkReach;
+        private float attackCooldown = 0f;
 
         public float movSpeed;
 
@@ -174,7 +175,7 @@ namespace AgentScript
 
         }
 
-        void ReduceHp(float dmgTaken)
+        void ReduceHp(int dmgTaken)
         {
             this.currentHp -= dmgTaken;
             if (this.currentHp <= 0)
