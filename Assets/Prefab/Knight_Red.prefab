@@ -365,7 +365,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 4300022, guid: d288a0e4a2d923b46898986e979da643, type: 3}
 --- !u!114 &-921959515039562368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,6 +414,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLeader: 0
+  team: 0
   maxHp: 7
   currentHp: 7
   atk: 2
@@ -423,7 +424,7 @@ MonoBehaviour:
   power: 5
   hasBeenAttacked: 0
   leader: {fileID: 0}
-  _animator: {fileID: 0}
+  _animator: {fileID: 9536352}
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}

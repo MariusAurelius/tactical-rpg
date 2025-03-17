@@ -43,7 +43,6 @@ namespace AgentScript
         [SerializeField]
         protected Animator _animator;
 
-
         public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
         public GameObject goal;
         public Unit currentEnemy;
@@ -60,7 +59,6 @@ namespace AgentScript
 
             leader = GetLeader();
             isLeader = (leader == this);
-
         }
 
         void Update()
@@ -159,7 +157,6 @@ namespace AgentScript
             _animator.SetFloat("speed", agent.velocity.magnitude);
         }
 
-
         void Go()
         {
             if (currentEnemy != null)
@@ -179,6 +176,9 @@ namespace AgentScript
                     this.currentBehaviour = BEHAVIOURS.ATTACKING;
                 }
             }
+
+            // Update the animator with the current speed
+            _animator.SetFloat("speed", agent.velocity.magnitude);
 
         }
 
