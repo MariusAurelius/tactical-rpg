@@ -2492,11 +2492,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1312100705}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23b358cbbadc540fab534f0dfec95fc4, type: 3}
+  m_Script: {fileID: 11500000, guid: bd74a0237e48d41ec9aa4103dfeccc5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teamId: 1
-  warriorPrefab: {fileID: 5402130605783797370, guid: 2d9dcae9b380a424e8de11e0a01c7670, type: 3}
+  warriorPrefab: {fileID: 111886, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
   peasantPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
   archerPrefab: {fileID: 104176, guid: 359a3881d0d0e4143a67b57d6482e854, type: 3}
   spawnPoint: {fileID: 1312100707}
@@ -2532,8 +2531,8 @@ Transform:
   m_Children:
   - {fileID: 1339103102}
   - {fileID: 1666506790}
-  - {fileID: 1312100707}
   - {fileID: 1936128277}
+  - {fileID: 1312100707}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1339103101
@@ -3553,10 +3552,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1936128275}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23b358cbbadc540fab534f0dfec95fc4, type: 3}
+  m_Script: {fileID: 11500000, guid: be90c47f6cc344ac5931d49157fc5183, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  teamId: 2
   warriorPrefab: {fileID: 172688, guid: 6724992a26d21854798810e3993415be, type: 3}
   peasantPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
   archerPrefab: {fileID: 142034, guid: b81ba67e44b1b174d9ef4491f146ee35, type: 3}
