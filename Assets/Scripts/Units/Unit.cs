@@ -70,7 +70,6 @@ namespace AgentScript
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
             }
-            Debug.Log(currentBehaviour);
             switch (currentBehaviour)
             {
                 case BEHAVIOURS.WANDERING:
@@ -81,8 +80,11 @@ namespace AgentScript
                     Unit enemy = SeeEnemy();
                     if (enemy != null)
                     {
-                        currentEnemy = enemy;
-                        currentBehaviour = BEHAVIOURS.GOING;
+                        if (enemy.team != this.team)
+                        {
+                            currentEnemy = enemy;
+                            currentBehaviour = BEHAVIOURS.GOING;
+                        }
                     }
                     break;
                 case BEHAVIOURS.GOING:
@@ -131,8 +133,13 @@ namespace AgentScript
                 if (raycastInfo.collider != null)
                 {
                     Unit unit = raycastInfo.collider.GetComponent<Unit>();
+
                     if (unit != null)
                     {
+
+                        Debug.Log("Enemy seen");
+
+                        Debug.Log(raycastInfo.collider.GetComponent<Unit>());
                         return unit;
                     }
                 }
@@ -143,7 +150,7 @@ namespace AgentScript
 
         void Search()
         {
-            if (agent.remainingDistance < 0.3f)
+            if (agent.remainingDistance < 5f)
             {
                 SetRandomDestination();
             }
