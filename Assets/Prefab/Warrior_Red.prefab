@@ -503,6 +503,7 @@ GameObject:
   - component: {fileID: 2908702041882389671}
   - component: {fileID: 3459076659044797748}
   - component: {fileID: -8458988485398167017}
+  - component: {fileID: -5203087193051569758}
   m_Layer: 0
   m_Name: Warrior_Red
   m_TagString: Untagged
@@ -623,6 +624,18 @@ MonoBehaviour:
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+--- !u!114 &-5203087193051569758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 111886}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &113432
 GameObject:
   m_ObjectHideFlags: 0

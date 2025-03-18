@@ -295,6 +295,7 @@ GameObject:
   - component: {fileID: -921959515039562368}
   - component: {fileID: 968554750931601771}
   - component: {fileID: 6991386358662736913}
+  - component: {fileID: 9177279748482540665}
   m_Layer: 0
   m_Name: Knight_Red
   m_TagString: Untagged
@@ -365,7 +366,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 4300022, guid: d288a0e4a2d923b46898986e979da643, type: 3}
+  m_Mesh: {fileID: 4300020, guid: fd7d68a65822e4a44a9ef78850e64cfc, type: 3}
 --- !u!114 &-921959515039562368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,6 +429,18 @@ MonoBehaviour:
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+--- !u!114 &9177279748482540665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 104176}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &105628
 GameObject:
   m_ObjectHideFlags: 0

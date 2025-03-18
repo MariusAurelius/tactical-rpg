@@ -96,6 +96,11 @@ namespace AgentScript
         {
             if (currentEnemy != null)
             {
+                
+                Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
+                Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
+                transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
+
                 if (attackCooldown <= 0f)
                 {
                     currentEnemy.ReduceHp(this.atk);
@@ -212,6 +217,12 @@ namespace AgentScript
             }
             return null;
 
+        }
+
+        public float GetVelocity()
+        {
+            // Retourne la vitesse normalisée de l'agent (entre 0 et 1)
+            return Mathf.Clamp01(agent.velocity.magnitude / agent.speed);
         }
 
 
