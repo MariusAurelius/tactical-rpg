@@ -20,7 +20,7 @@ public class ScenesManager : MonoBehaviour
         MainMenu,
         GeneralSettingsMenu, 
         GameSettingsMenu,
-        Game
+        Play
     }
 
     public void LoadScene(Scenes scene) {
@@ -42,8 +42,8 @@ public class ScenesManager : MonoBehaviour
     public void LoadGameSettingsMenu() {
         SceneManager.LoadScene(Scenes.GameSettingsMenu.ToString());
     }
-    public void LoadGame() {
-        SceneManager.LoadScene(Scenes.Game.ToString());
+    public void LoadPlay() {
+        SceneManager.LoadScene(Scenes.Play.ToString());
     }
 
     public void QuitGame() {

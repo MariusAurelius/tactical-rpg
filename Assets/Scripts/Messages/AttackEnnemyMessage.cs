@@ -1,14 +1,16 @@
-﻿using UnityEngine;
-using AgentScript;
+﻿using AgentScript;
 
-public class AttackEnnemyMessage : Message
+/// <summary>
+/// A message that tells a unit (the recipient) to attack an enemy.
+/// </summary>
+public class AttackEnemyMessage : Message
 {
-    public Vector3 ennemyPos;
-    // public Unit ennemy;
+    // public Vector3 enemyPos; // maybe for later : go to pos then see if enemy there ?
+    public Unit enemy;
 
-    public AttackEnnemyMessage(Unit sender, Unit recipient, Vector3 pos /*, Unit ennemy*/) : base(sender, recipient)
+    public AttackEnemyMessage(Unit sender, Unit recipient, Unit enemy /*Vector3 pos*/) : base(sender, recipient)
     {
-        ennemyPos = pos;
-        //this.ennemy = ennemy; 
+        // enemyPos = pos;
+        this.enemy = enemy; 
     }
 }

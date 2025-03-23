@@ -17,18 +17,26 @@ namespace AgentScript
             ATTACKING
         }
 
+        public enum Team
+        {
+            BLUE,
+            RED
+        }
+
         public bool isLeader;
-        public int team;
-        public int maxHp = 0;
-        public int currentHp = 0;
-        public int atk;
-        public int atkSpeed;
-        public int atkReach;
-        private float attackCooldown = 0f;
+        public int team; // Team team
+        protected int maxHp = 0;
+        protected int currentHp = 0;
+        protected int atk;
+        protected int atkSpeed;
+        protected int atkReach;
+        protected float attackCooldown = 0f;
 
-        public float movSpeed;
+        protected float movSpeed;
 
-        public int power;
+        protected int power;
+
+        public int perceivedPower = -1; // unknown to enemy
 
         public bool hasBeenAttacked;
 
@@ -52,7 +60,6 @@ namespace AgentScript
 
         void Start()
         {
-
             agent = this.GetComponent<NavMeshAgent>();
             floor = GameObject.Find("floor");
             bnd = floor.GetComponent<Renderer>().bounds;
@@ -60,17 +67,16 @@ namespace AgentScript
 
             leader = GetLeader();
             isLeader = (leader == this);
-
         }
 
         void Update()
         {
 
-            if (this.currentEnemy == null)
+            if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
             }
-            Debug.Log(currentBehaviour);
+            // Debug.Log(currentBehaviour);
             switch (currentBehaviour)
             {
                 case BEHAVIOURS.WANDERING:
@@ -81,8 +87,8 @@ namespace AgentScript
                     Unit enemy = SeeEnemy();
                     if (enemy != null)
                     {
-                        currentEnemy = enemy;
-                        currentBehaviour = BEHAVIOURS.GOING;
+                        SendMessage(new SpottedEnemyMessage(this, leader, enemy));
+                        // SetEnemy(enemy);
                     }
                     break;
                 case BEHAVIOURS.GOING:
@@ -91,7 +97,6 @@ namespace AgentScript
                     Attack(); break;
                 default: throw new Exception("Unknown behaviour"); //break;
             }
-
         }
 
         void Attack()
@@ -102,6 +107,8 @@ namespace AgentScript
                 {
                     currentEnemy.ReduceHp(this.atk);
                     attackCooldown = 1f / atkSpeed;  // Cooldown based on attack speed
+
+                    currentEnemy.hasBeenAttacked = true;
                 }
                 else
                 {
@@ -152,6 +159,23 @@ namespace AgentScript
             _animator.SetFloat("speed", agent.velocity.magnitude);
         }
 
+        void SetEnemy(Unit enemy)
+        {
+            currentEnemy = enemy;
+            currentBehaviour = BEHAVIOURS.GOING;
+        }
+
+        void ClearEnemy()
+        {
+            currentEnemy = null;
+            currentBehaviour = BEHAVIOURS.WANDERING;
+        }
+
+        void Retreat()
+        {
+            ClearEnemy();
+            agent.SetDestination(leader.transform.position);
+        }
 
         void Go()
         {
@@ -162,8 +186,10 @@ namespace AgentScript
                 Debug.Log(agent.remainingDistance < this.atkReach);
                 if (agent.remainingDistance < this.atkReach)
                 {
-
-                    currentEnemy.currentEnemy = this;
+                    if (currentEnemy.currentEnemy == null) // if enemy is not already attacking someone else
+                    {
+                        currentEnemy.currentEnemy = this;
+                    }
                     if (currentEnemy.currentBehaviour != BEHAVIOURS.ATTACKING)
                     {
 
@@ -184,20 +210,31 @@ namespace AgentScript
                 return;
             }
         }
+
         public int GetHp()
         {
-            if (hasBeenAttacked)
+            return currentHp;
+        }
+
+        public int GetHPPercentage()
+        {
+            return (int)((currentHp / maxHp) * 100);
+        }
+
+        public int GetEnemyHp(Unit enemy)
+        {
+            if (enemy.hasBeenAttacked)
             {
-                return currentHp;
+                return enemy.GetHp();
             }
 
             // hp unknown
             return -1;
         }
 
-        public int GetEnnemyHp(Unit ennemy)
+        public bool isLowHp()
         {
-            return ennemy.GetHp();
+            return GetHPPercentage() < 30;
         }
 
 
@@ -229,10 +266,35 @@ namespace AgentScript
                     units.Add(unit);
                 }
             }
+            // or simpler is to use team field and compare in nearby troops
 
             return units;
         }
 
+        public int GetPower()
+        {
+            return power;
+        }
+
+        /// <summary>
+        /// Decides if this should attack enemy.
+        /// </summary>
+        /// <param name="enemy"></param>
+        /// <returns>
+        /// true if this should attack enemy, false otherwise.
+        /// </returns>
+        public bool ShouldAttackEnemy(Unit enemy)
+        {
+            if (enemy.currentEnemy != null && !enemy.currentEnemy.isLowHp() && enemy.currentEnemy.team == team) // if enemy is already attacking a friend that isn't low hp
+            {
+                return false;
+            }
+            if (enemy.isLowHp() || enemy.perceivedPower <= this.power) // if power unknown or enemy is weaker / same power, or if enemy is low hp
+            {
+                return true;
+            }
+            return false;
+        }
 
         // envoi de messages
 
@@ -257,23 +319,32 @@ namespace AgentScript
 
             switch (message)
             {
-                case SharePositionMessage sharePositionMessage:
-                    HandleSharePosition(sharePositionMessage);
+                case AskForHelp askForHelp:
+                    HandleAskForHelp(askForHelp);
                     break;
-                case SpottedEnnemyMessage spottedEnnemyMessage:
-                    HandleSpottedEnemy(spottedEnnemyMessage);
-                    break;
-                case AttackEnnemyMessage attackEnemyMessage:
+                case AttackEnemyMessage attackEnemyMessage:
                     HandleAttackEnemy(attackEnemyMessage);
                     break;
-                case NeedHelpMessage needHelpMessage:
-                    HandleNeedHelp(needHelpMessage);
+                case GoHelpMessage goHelpMessage:
+                    HandleGoHelp(goHelpMessage);
                     break;
                 case GoToMessage goToMessage:
                     HandleGoTo(goToMessage);
                     break;
-                case GoHelpMessage goHelpMessage:
-                    HandleGoHelp(goHelpMessage);
+                case NeedHelpMessage needHelpMessage:
+                    HandleNeedHelp(needHelpMessage);
+                    break;
+                case RetreatMessage retreatMessage:
+                    HandleRetreat(retreatMessage);
+                    break;
+                case ShareGroupStatusMessage shareGroupStatusMessage:
+                    HandleShareGroupStatus(shareGroupStatusMessage);
+                    break;
+                case SharePositionMessage sharePositionMessage:
+                    HandleSharePosition(sharePositionMessage);
+                    break;
+                case SpottedEnemyMessage spottedEnemyMessage:
+                    HandleSpottedEnemy(spottedEnemyMessage);
                     break;
             }
 
@@ -283,40 +354,148 @@ namespace AgentScript
             }
         }
 
+        /// <summary>
+        /// If enough power is available from nearby troops, will attack enemy, else will retreat to leader.
+        /// </summary>
+        /// <param name="askForHelp"></param>
+        private void HandleAskForHelp(AskForHelp askForHelp)
+        {
+                // gather power of nearby troops
+                List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
+                List<Unit> availableNearbyTroops = new();
+                int combinedPower = 0;
+                foreach (Unit unit in nearbyTroops)
+                { // instead do it with a message that is a coroutine
+                    if (unit.currentBehaviour != BEHAVIOURS.ATTACKING || unit.currentEnemy == askForHelp.enemy) // if not currently attacking a different enemy
+                    {
+                        combinedPower += unit.GetPower();
+                        availableNearbyTroops.Add(unit);
+                    }
+                }
+
+                if (combinedPower >= askForHelp.enemy.perceivedPower) // if enough power to attack enemy
+                {
+                    foreach (var friend in availableNearbyTroops)
+                    {
+                        SendMessage(new AttackEnemyMessage(this, friend, askForHelp.enemy));
+                    }
+                    SetEnemy(askForHelp.enemy);
+                }
+                else
+                {
+                    Retreat();
+                }
+        }
+
+        /// <summary>
+        /// Sets enemy as the current enemy after receiving the order to attack from the leader.
+        /// </summary>
+        /// <param name="attackEnemyMessage"></param>
+        private void HandleAttackEnemy(AttackEnemyMessage attackEnemyMessage)
+        {
+            SetEnemy(attackEnemyMessage.enemy);
+        }
+
+        /// <summary>
+        /// Sets destination to friend's position and sets friend's enemy as the current enemy after receiving the order to go help the friend from the leader.
+        /// </summary>
+        /// <param name="goHelpMessage"></param>
         private void HandleGoHelp(GoHelpMessage goHelpMessage)
         {
             agent.SetDestination(goHelpMessage.friend.transform.position);
+            SetEnemy(goHelpMessage.friend.currentEnemy);
         }
 
+        /// <summary>
+        /// Sets destination to the given position after receiving the order to go there from the leader.
+        /// </summary>
+        /// <param name="goToMessage"></param>
         private void HandleGoTo(GoToMessage goToMessage)
         {
             agent.SetDestination(goToMessage.destination);
         }
 
+        /// <summary>
+        /// If not currently attacking, sets enemy as the current enemy after receiving the ask for help from a nearby friendly troop.
+        /// </summary>
+        /// <param name="needHelpMessage"></param>
         private void HandleNeedHelp(NeedHelpMessage needHelpMessage)
         {
-            throw new NotImplementedException();
+            if (currentBehaviour != BEHAVIOURS.ATTACKING)
+            {
+                SetEnemy(needHelpMessage.sender.currentEnemy);
+                
+            }
         }
 
-        private void HandleAttackEnemy(AttackEnnemyMessage attackEnemyMessage)
+        /// <summary>
+        /// Retreats to leader after receiving the order to retreat.
+        /// </summary>
+        /// <param name="retreatMessage"></param>
+        private void HandleRetreat(RetreatMessage retreatMessage) {
+            Retreat();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="shareGroupStatusMessage"></param>
+        private void HandleShareGroupStatus(ShareGroupStatusMessage shareGroupStatusMessage)
         {
             throw new NotImplementedException();
         }
 
-        private void HandleSpottedEnemy(SpottedEnnemyMessage spottedEnnemyMessage)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Leader decides if units are too far apart and need to move closer to each other.
+        /// </summary>
+        /// <param name="sharePositionMessage"></param>
         private void HandleSharePosition(SharePositionMessage sharePositionMessage)
         {
+            if (!isLeader)
+            {
+                Debug.LogWarning("position shared to a unit that is not a leader");
+                return;
+            }
+            
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Leader responds to sender, telling them if they should attack or ask for support. If enough support is available, will attack enemy, else will retreat to leader.
+        /// </summary>
+        /// <param name="spottedEnemyMessage"></param>
+        private void HandleSpottedEnemy(SpottedEnemyMessage spottedEnemyMessage)
+        {
+            if (isLeader)
+            {
+                // decide if should attack enemy or ask for help before attacking
+
+                if (spottedEnemyMessage.sender.ShouldAttackEnemy(spottedEnemyMessage.enemy))
+                {
+                    SendMessage(new AttackEnemyMessage(this, spottedEnemyMessage.sender, spottedEnemyMessage.enemy));
+                }
+
+                else
+                {
+                    // then : instead of retreat, tell it to ask for more power from nearby troops before attacking (AskForHelp msg) > 
+                    //  sender asks nearby troops if they can potentially help (NOT NeedHelp msg) and gathers combined power of those available
+                    //  if combined power is enough, sender attacks enemy
+                    //  else, sender retreats
+                    SendMessage(new AskForHelp(this, spottedEnemyMessage.sender, spottedEnemyMessage.enemy));
+                    // SendMessage(new RetreatMessage(this, spottedEnemyMessage.sender));
+                }
+            }
+            else {
+                Debug.LogWarning("SpottedEnemyMessage received by a unit that is not a leader");
+            } 
+        }
+
+        
 
 
         // ...
 
-        // fonctions pour le leader
+        // fonctions pour le leader ?
         // ...
 
     }
