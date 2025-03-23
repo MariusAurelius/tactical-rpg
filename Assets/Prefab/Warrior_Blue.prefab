@@ -2394,6 +2394,7 @@ GameObject:
   - component: {fileID: 8035176661657540105}
   - component: {fileID: 818879669608276275}
   - component: {fileID: -1859271179134152684}
+  - component: {fileID: 413812324261526014}
   m_Layer: 0
   m_Name: Warrior_Blue
   m_TagString: Untagged
@@ -2431,11 +2432,11 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 172688}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: fd7d68a65822e4a44a9ef78850e64cfc, type: 3}
+  m_Avatar: {fileID: 9000000, guid: 32562d1256a1b3b4ca9be3d6ce7adf64, type: 3}
   m_Controller: {fileID: 9100000, guid: c5067d7e3d128469f93c8816fbc71963, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -2464,7 +2465,7 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  m_Mesh: {fileID: 4300020, guid: fd7d68a65822e4a44a9ef78850e64cfc, type: 3}
 --- !u!195 &818879669608276275
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2500,6 +2501,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isLeader: 0
+  team: 0
   maxHp: 7
   currentHp: 7
   atk: 2
@@ -2507,10 +2509,24 @@ MonoBehaviour:
   atkReach: 5
   movSpeed: 2
   power: 10
+  hasBeenAttacked: 0
+  leader: {fileID: 0}
   _animator: {fileID: 9523868}
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+--- !u!114 &413812324261526014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &172980
 GameObject:
   m_ObjectHideFlags: 0

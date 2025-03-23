@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using AgentScript;
 
-/// <summary>
-/// Class making the characters spawn characters based on the composition data.
-/// </summary> 
-public class CharacterSpawner : MonoBehaviour
+public class BlueTeamSpawner : MonoBehaviour
 {
-    public int teamId;
-
     public GameObject warriorPrefab;
     public GameObject peasantPrefab;
     public GameObject archerPrefab;
@@ -31,7 +27,6 @@ public class CharacterSpawner : MonoBehaviour
 
         if (gameSettings != null)
         {
-            // Assuming you want to load BlueCompositions for this example
             compositions = new List<CharacterComposition>
             {
                 new CharacterComposition { type = typeof(Peasant), count = gameSettings.BluePeasants },
@@ -39,11 +34,11 @@ public class CharacterSpawner : MonoBehaviour
                 new CharacterComposition { type = typeof(Archer), count = gameSettings.BlueArchers }
             };
 
-            Debug.Log("Composition data loaded successfully.");
+            Debug.Log("Blue team composition data loaded successfully.");
         }
         else
         {
-            Debug.LogError("Failed to load composition data. JSON file not found or invalid.");
+            Debug.LogError("Failed to load blue team composition data. JSON file not found or invalid.");
         }
     }
 
@@ -69,14 +64,15 @@ public class CharacterSpawner : MonoBehaviour
             for (int i = 0; i < composition.count; i++)
             {
                 GameObject character = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
-                Character characterComponent = character.GetComponent<Character>();
-                if (characterComponent != null)
+                Unit unitComponent = character.GetComponent<Unit>();
+                if (unitComponent != null)
                 {
-                    characterComponent.teamId = teamId;
+                    unitComponent.team = 2; // Team ID for blue team
                 }
 
                 // Assign the character to the team parent object
                 character.transform.parent = teamParent;
+                Debug.Log($"Spawned {composition.type.Name} for blue team");
             }
         }
     }

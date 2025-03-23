@@ -1,5 +1,4 @@
 using UnityEngine;
-
 using AgentScript;
 
 public class Archer : Unit

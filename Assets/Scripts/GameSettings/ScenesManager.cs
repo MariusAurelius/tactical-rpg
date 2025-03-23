@@ -42,6 +42,8 @@ public class ScenesManager : MonoBehaviour
     public void LoadGameSettingsMenu() {
         SceneManager.LoadScene(Scenes.GameSettingsMenu.ToString());
     }
+
+
     public void LoadPlay() {
         SceneManager.LoadScene(Scenes.Play.ToString());
     }
