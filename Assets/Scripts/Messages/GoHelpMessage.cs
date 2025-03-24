@@ -1,6 +1,8 @@
-﻿using UnityEngine;
-using AgentScript;
+﻿using AgentScript;
 
+/// <summary>
+/// A message to tell a unit (the recipient) to go help another unit (the friend).
+/// </summary>
 public class GoHelpMessage : Message
 {
     /// <summary>

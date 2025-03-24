@@ -2394,6 +2394,7 @@ GameObject:
   - component: {fileID: 8035176661657540105}
   - component: {fileID: 818879669608276275}
   - component: {fileID: -1859271179134152684}
+  - component: {fileID: 413812324261526014}
   m_Layer: 0
   m_Name: Warrior_Blue
   m_TagString: Untagged
@@ -2514,6 +2515,18 @@ MonoBehaviour:
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+--- !u!114 &413812324261526014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &172980
 GameObject:
   m_ObjectHideFlags: 0

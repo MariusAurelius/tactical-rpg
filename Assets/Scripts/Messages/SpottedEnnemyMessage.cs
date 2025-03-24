@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using AgentScript;
 
-public class SpottedEnnemyMessage : Message
+/// <summary>
+/// A message that tells the recipient (the leader) that the sender has spotted an enemy.
+/// </summary>
+public class SpottedEnemyMessage : Message
 {
-    public Vector3 ennemyPos;
-    // public Unit ennemy;
+    public Unit enemy;
 
-    public SpottedEnnemyMessage(Unit sender, Unit recipient, Vector3 pos /*, Unit ennemy*/) : base(sender, recipient)
+    public SpottedEnemyMessage(Unit sender, Unit recipient, Unit enemy) : base(sender, recipient)
     {
-        ennemyPos = pos;
-        //this.ennemy = ennemy;
+        this.enemy = enemy;
     }
 }

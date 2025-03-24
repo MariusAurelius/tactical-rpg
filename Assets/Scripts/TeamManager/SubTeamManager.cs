@@ -126,13 +126,13 @@ public class SubTeamManager : MonoBehaviour
         // Trouve les candidats pour le leader en fonction de la puissance
         foreach (Unit unit in subTeam)
         {
-            if (unit.power > maxPower)
+            if (unit.GetPower() > maxPower)
             {
-                maxPower = unit.power;
+                maxPower = unit.GetPower();
                 candidates.Clear();
                 candidates.Add(unit);
             }
-            else if (unit.power == maxPower)
+            else if (unit.GetPower() == maxPower)
             {
                 candidates.Add(unit);
             }
