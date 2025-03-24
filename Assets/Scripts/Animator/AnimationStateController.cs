@@ -50,6 +50,6 @@ public class AnimationStateController : MonoBehaviour
     {
         _animator.SetBool("isMoving", isMoving);
         _animator.SetBool("isAttacking", isAttacking);
-        _animator.SetFloat("velocity", velocity);
+        _animator.SetFloat("Velocity", velocity);
     }
 }

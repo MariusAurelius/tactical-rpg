@@ -46,14 +46,13 @@ namespace AgentScript
         private NavMeshAgent agent;
         private GameObject floor = null;
         private Bounds bnd;
+        public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
+        public GameObject goal;
+        public Unit currentEnemy;
 
         [Header("Animations")]
         [SerializeField]
         protected Animator _animator;
-
-        public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
-        public GameObject goal;
-        public Unit currentEnemy;
 
         public Queue<Message> ReceivedMessages;
 
@@ -166,7 +165,7 @@ namespace AgentScript
             }
 
             // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
         }
         void SetEnemy(Unit enemy)
         {
@@ -209,7 +208,7 @@ namespace AgentScript
             }
 
             // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
 
         }
 
@@ -518,3 +517,4 @@ namespace AgentScript
 
     }
 }
+

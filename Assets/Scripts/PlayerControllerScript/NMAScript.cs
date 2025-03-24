@@ -30,7 +30,7 @@ public class NMAscript : MonoBehaviour
         }
 
         // Update the animator with the current speed
-        _animator.SetFloat("speed", nma.velocity.magnitude);
+        _animator.SetFloat("Velocity", nma.velocity.magnitude);
     }
     private void SetRandomDestination()
     {
