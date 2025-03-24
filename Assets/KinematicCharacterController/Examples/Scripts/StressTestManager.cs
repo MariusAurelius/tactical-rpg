@@ -38,7 +38,9 @@ namespace KinematicCharacterController.Examples
         private void UpdateOnImages()
         {
             RenderOn.enabled = Camera.cullingMask == -1;
+#pragma warning disable CS0618 // Type or member is obsolete
             SimOn.enabled = Physics.autoSimulation;
+#pragma warning restore CS0618 // Type or member is obsolete
             InterpOn.enabled = KinematicCharacterSystem.Settings.Interpolate;
         }
 
@@ -65,7 +67,9 @@ namespace KinematicCharacterController.Examples
 
         public void TogglePhysicsSim()
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             Physics.autoSimulation = !Physics.autoSimulation;
+#pragma warning restore CS0618 // Type or member is obsolete
             UpdateOnImages();
         }
 

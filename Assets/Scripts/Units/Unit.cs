@@ -64,13 +64,19 @@ namespace AgentScript
             bnd = floor.GetComponent<Renderer>().bounds;
             Search();
 
-            leader = GetLeader();
-            isLeader = (leader == this);
+            //leader = GetLeader();
+            //isLeader = (leader == this);
+
+            ReceivedMessages = new Queue<Message>();
         }
 
         void Update()
         {
-
+            if (leader == null)
+            {
+                leader = GetLeader();
+                isLeader = (leader == this);
+            }
             if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
@@ -159,8 +165,8 @@ namespace AgentScript
                 SetRandomDestination();
             }
 
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            // Update the animator with the current velocity
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
         }
         void SetEnemy(Unit enemy)
         {
@@ -186,7 +192,7 @@ namespace AgentScript
             {
                 agent.SetDestination(currentEnemy.transform.position);
 
-                Debug.Log(agent.remainingDistance < this.atkReach);
+                // Debug.Log(agent.remainingDistance < this.atkReach);
                 if (agent.remainingDistance < this.atkReach)
                 {
                     if (currentEnemy.currentEnemy == null) // if enemy is not already attacking someone else
@@ -202,8 +208,8 @@ namespace AgentScript
                 }
             }
 
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            // Update the animator with the current velocity
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
 
         }
 
@@ -245,14 +251,17 @@ namespace AgentScript
 
 
         public Unit GetLeader() {
-         
+            Debug.Log(transform.parent.name);
             foreach (Transform child in transform.parent)
             {
-                if (child.CompareTag("leader"))
+                Debug.Log(child.name);
+                if (child.CompareTag("Leader"))
                 {
+                    Debug.LogWarning("Leader found");
                     return child.GetComponent<Unit>();
                 }
             }
+            Debug.LogWarning("No leader found");
             return null;
 
         }
