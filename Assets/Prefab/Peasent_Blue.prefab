@@ -2289,19 +2289,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isLeader: 0
   team: 0
-  maxHp: 7
-  currentHp: 7
-  atk: 2
-  atkSpeed: 1
-  atkReach: 5
-  movSpeed: 2
-  power: 5
+  perceivedPower: -1
   hasBeenAttacked: 0
   leader: {fileID: 0}
-  _animator: {fileID: 9575092}
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+  _animator: {fileID: 9575092}
 --- !u!114 &6789833904437028591
 MonoBehaviour:
   m_ObjectHideFlags: 0

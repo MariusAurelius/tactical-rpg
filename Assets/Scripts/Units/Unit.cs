@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using AgentScript;
 
 namespace AgentScript
 {
@@ -81,6 +82,7 @@ namespace AgentScript
                 case BEHAVIOURS.WANDERING:
                     if (agent.remainingDistance == 0)
                     {
+                        agent.speed = movSpeed;
                         Search();
                     }
                     Unit enemy = SeeEnemy();
@@ -96,6 +98,7 @@ namespace AgentScript
                     }
                     break;
                 case BEHAVIOURS.GOING:
+                    agent.speed = movSpeed * 3f;
                     Go(); break;
                 case BEHAVIOURS.ATTACKING:
                     Attack(); break;
@@ -170,9 +173,6 @@ namespace AgentScript
             {
                 SetRandomDestination();
             }
-
-            // Update the animator with the current velocity
-            _animator.SetFloat("Velocity", agent.velocity.magnitude);
         }
         void SetEnemy(Unit enemy)
         {
@@ -213,9 +213,10 @@ namespace AgentScript
                     this.currentBehaviour = BEHAVIOURS.ATTACKING;
                 }
             }
-
-            // Update the animator with the current velocity
-            _animator.SetFloat("Velocity", agent.velocity.magnitude);
+            else
+            {
+                currentBehaviour = BEHAVIOURS.WANDERING;
+            }
 
         }
 

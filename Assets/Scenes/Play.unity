@@ -3383,13 +3383,13 @@ MonoBehaviour:
   teamConfigurations:
   - teamId: 1
     teamParent: {fileID: 1421173516}
-    minSubTeams: 2
-    minUnitsPerSubTeam: 2
+    minSubTeams: 1
+    minUnitsPerSubTeam: 1
     subTeamCount: 3
   - teamId: 2
     teamParent: {fileID: 344082331}
-    minSubTeams: 2
-    minUnitsPerSubTeam: 2
+    minSubTeams: 1
+    minUnitsPerSubTeam: 1
     subTeamCount: 3
 --- !u!4 &1761433662
 Transform:

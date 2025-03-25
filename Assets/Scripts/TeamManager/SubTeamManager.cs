@@ -7,8 +7,8 @@ public class TeamConfiguration
 {
     public int teamId; // Identifiant de l'équipe
     public Transform teamParent; // Objet parent pour l'équipe
-    public int minSubTeams = 2; // Nombre minimum de sous-équipes
-    public int minUnitsPerSubTeam = 2; // Nombre minimum d'unités par sous-équipe
+    public int minSubTeams = 1; // Nombre minimum de sous-équipes
+    public int minUnitsPerSubTeam = 1; // Nombre minimum d'unités par sous-équipe
 
     [HideInInspector]
     public int subTeamCount = 3; // Nombre de sous-équipes souhaité, non modifiable dans l'inspecteur Unity

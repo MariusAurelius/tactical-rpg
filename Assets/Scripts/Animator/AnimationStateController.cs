@@ -31,8 +31,10 @@ public class AnimationStateController : MonoBehaviour
         switch (_unit.currentBehaviour)
         {
             case Unit.BEHAVIOURS.WANDERING:
+                SetAnimatorParameters(isMoving: true, isAttacking: false, velocity: 0.2f);
+                break;
             case Unit.BEHAVIOURS.GOING:
-                SetAnimatorParameters(isMoving: true, isAttacking: false, velocity: _unit.GetVelocity());
+                SetAnimatorParameters(isMoving: true, isAttacking: false, velocity: 1f);
                 break;
 
             case Unit.BEHAVIOURS.ATTACKING:
