@@ -46,14 +46,13 @@ namespace AgentScript
         private NavMeshAgent agent;
         private GameObject floor = null;
         private Bounds bnd;
+        public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
+        public GameObject goal;
+        public Unit currentEnemy;
 
         [Header("Animations")]
         [SerializeField]
         protected Animator _animator;
-
-        public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
-        public GameObject goal;
-        public Unit currentEnemy;
 
         public Queue<Message> ReceivedMessages;
 
@@ -64,12 +63,15 @@ namespace AgentScript
             bnd = floor.GetComponent<Renderer>().bounds;
             Search();
             ReceivedMessages = new Queue<Message>();
-            //leader = GetLeader();
         }
 
         void Update()
         {
-
+            if (leader == null)
+            {
+                leader = GetLeader();
+                isLeader = (leader == this);
+            }
             if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
@@ -169,8 +171,8 @@ namespace AgentScript
                 SetRandomDestination();
             }
 
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            // Update the animator with the current velocity
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
         }
         void SetEnemy(Unit enemy)
         {
@@ -196,7 +198,7 @@ namespace AgentScript
             {
                 agent.SetDestination(currentEnemy.transform.position);
 
-                Debug.Log(agent.remainingDistance < this.atkReach);
+                // Debug.Log(agent.remainingDistance < this.atkReach);
                 if (agent.remainingDistance < this.atkReach)
                 {
                     if (currentEnemy.currentEnemy == null) // if enemy is not already attacking someone else
@@ -212,8 +214,8 @@ namespace AgentScript
                 }
             }
 
-            // Update the animator with the current speed
-            _animator.SetFloat("speed", agent.velocity.magnitude);
+            // Update the animator with the current velocity
+            _animator.SetFloat("Velocity", agent.velocity.magnitude);
 
         }
 
@@ -254,19 +256,18 @@ namespace AgentScript
         }
 
 
-        public Unit GetLeader()
-        {
-
-
+        public Unit GetLeader() {
+            Debug.Log(transform.parent.name);
             foreach (Transform child in transform.parent)
             {
-                Debug.Log("Voici le tag : " + child.tag);
+                Debug.Log(child.name);
                 if (child.CompareTag("Leader"))
                 {
-                    Debug.Log("Leader defini");
+                    Debug.LogWarning("Leader found");
                     return child.GetComponent<Unit>();
                 }
             }
+            Debug.LogWarning("No leader found");
             return null;
 
         }
@@ -529,3 +530,4 @@ namespace AgentScript
 
     }
 }
+

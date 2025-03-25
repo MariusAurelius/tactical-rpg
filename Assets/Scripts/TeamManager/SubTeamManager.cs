@@ -26,7 +26,7 @@ public class SubTeamManager : MonoBehaviour
         // Vérifie si la touche 'C' est pressée pour créer les sous-équipes
         if (Input.GetKeyDown(KeyCode.C))
         {
-            Debug.Log("Key C pressed. Creating sub-teams...");
+            Debug.Log("Key Space pressed. Creating sub-teams...");
             foreach (var config in teamConfigurations)
             {
                 CreateSubTeams(config);

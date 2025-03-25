@@ -72,7 +72,7 @@ public class BlueTeamSpawner : MonoBehaviour
 
                 // Assign the character to the team parent object
                 character.transform.parent = teamParent;
-                Debug.Log($"Spawned {composition.type.Name} for blue team");
+                // Debug.Log($"Spawned {composition.type.Name} for blue team");
             }
         }
     }

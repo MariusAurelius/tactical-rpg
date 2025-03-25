@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using AgentScript;
+using UnityEngine;
 
 public abstract class Message
 {
@@ -11,6 +12,8 @@ public abstract class Message
     {
         this.sender = sender;
         this.recipient = recipient;
+
+        Debug.Log("Message sent from " + sender.gameObject.name + " to " + recipient.gameObject.name + ": " + this.GetType().Name);
     }
 }
 
