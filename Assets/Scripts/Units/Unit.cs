@@ -63,9 +63,8 @@ namespace AgentScript
             floor = GameObject.Find("floor");
             bnd = floor.GetComponent<Renderer>().bounds;
             Search();
-
-            leader = GetLeader();
-            isLeader = (leader == this);
+            ReceivedMessages = new Queue<Message>();
+            //leader = GetLeader();
         }
 
         void Update()
@@ -87,7 +86,10 @@ namespace AgentScript
                     {
                         if (enemy.team != this.team)
                         {
-                        SendMessage(new SpottedEnemyMessage(this, leader, enemy));
+                            Debug.Log(leader);
+
+                            Debug.Log(enemy);
+                            SendMessage(new SpottedEnemyMessage(this, leader, enemy));
                         }
                     }
                     break;
@@ -103,7 +105,7 @@ namespace AgentScript
         {
             if (currentEnemy != null)
             {
-                
+
                 Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
@@ -146,11 +148,13 @@ namespace AgentScript
 
                     if (unit != null)
                     {
+                        if (unit.team != this.team)
+                        {
+                            Debug.Log("Enemy seen");
 
-                        Debug.Log("Enemy seen");
-
-                        Debug.Log(raycastInfo.collider.GetComponent<Unit>());
-                        return unit;
+                            Debug.Log(raycastInfo.collider.GetComponent<Unit>());
+                            return unit;
+                        }
                     }
                 }
             }
@@ -250,12 +254,16 @@ namespace AgentScript
         }
 
 
-        public Unit GetLeader() {
-         
+        public Unit GetLeader()
+        {
+
+
             foreach (Transform child in transform.parent)
             {
-                if (child.CompareTag("leader"))
+                Debug.Log("Voici le tag : " + child.tag);
+                if (child.CompareTag("Leader"))
                 {
+                    Debug.Log("Leader defini");
                     return child.GetComponent<Unit>();
                 }
             }
@@ -318,6 +326,7 @@ namespace AgentScript
 
         public void SendMessage(Message message)
         {
+            Debug.Log(message.ToString());
             if (message.recipient != null)
             {
                 message.recipient.ReceivedMessages.Enqueue(message);
@@ -378,31 +387,31 @@ namespace AgentScript
         /// <param name="askForHelp"></param>
         private void HandleAskForHelp(AskForHelp askForHelp)
         {
-                // gather power of nearby troops
-                List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
-                List<Unit> availableNearbyTroops = new();
-                int combinedPower = 0;
-                foreach (Unit unit in nearbyTroops)
-                { // instead do it with a message that is a coroutine
-                    if (unit.currentBehaviour != BEHAVIOURS.ATTACKING || unit.currentEnemy == askForHelp.enemy) // if not currently attacking a different enemy
-                    {
-                        combinedPower += unit.GetPower();
-                        availableNearbyTroops.Add(unit);
-                    }
+            // gather power of nearby troops
+            List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
+            List<Unit> availableNearbyTroops = new();
+            int combinedPower = 0;
+            foreach (Unit unit in nearbyTroops)
+            { // instead do it with a message that is a coroutine
+                if (unit.currentBehaviour != BEHAVIOURS.ATTACKING || unit.currentEnemy == askForHelp.enemy) // if not currently attacking a different enemy
+                {
+                    combinedPower += unit.GetPower();
+                    availableNearbyTroops.Add(unit);
                 }
+            }
 
-                if (combinedPower >= askForHelp.enemy.perceivedPower) // if enough power to attack enemy
+            if (combinedPower >= askForHelp.enemy.perceivedPower) // if enough power to attack enemy
+            {
+                foreach (var friend in availableNearbyTroops)
                 {
-                    foreach (var friend in availableNearbyTroops)
-                    {
-                        SendMessage(new AttackEnemyMessage(this, friend, askForHelp.enemy));
-                    }
-                    SetEnemy(askForHelp.enemy);
+                    SendMessage(new AttackEnemyMessage(this, friend, askForHelp.enemy));
                 }
-                else
-                {
-                    Retreat();
-                }
+                SetEnemy(askForHelp.enemy);
+            }
+            else
+            {
+                Retreat();
+            }
         }
 
         /// <summary>
@@ -442,7 +451,7 @@ namespace AgentScript
             if (currentBehaviour != BEHAVIOURS.ATTACKING)
             {
                 SetEnemy(needHelpMessage.sender.currentEnemy);
-                
+
             }
         }
 
@@ -450,7 +459,8 @@ namespace AgentScript
         /// Retreats to leader after receiving the order to retreat.
         /// </summary>
         /// <param name="retreatMessage"></param>
-        private void HandleRetreat(RetreatMessage retreatMessage) {
+        private void HandleRetreat(RetreatMessage retreatMessage)
+        {
             Retreat();
         }
 
@@ -474,7 +484,7 @@ namespace AgentScript
                 Debug.LogWarning("position shared to a unit that is not a leader");
                 return;
             }
-            
+
             throw new NotImplementedException();
         }
 
@@ -503,12 +513,13 @@ namespace AgentScript
                     // SendMessage(new RetreatMessage(this, spottedEnemyMessage.sender));
                 }
             }
-            else {
+            else
+            {
                 Debug.LogWarning("SpottedEnemyMessage received by a unit that is not a leader");
-            } 
+            }
         }
 
-        
+
 
 
         // ...

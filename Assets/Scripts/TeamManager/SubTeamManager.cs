@@ -108,11 +108,11 @@ public class SubTeamManager : MonoBehaviour
         foreach (var subTeam in subTeams[config.teamId])
         {
             Unit leader = subTeam.Find(unit => unit.isLeader);
-            foreach (var unit in subTeam)
+            foreach (Unit unit in subTeam)
             {
-                if (!unit.isLeader) // Vérifie si l'unité n'est pas le leader
-                {
-                    unit.leader = leader;
+                unit.leader = unit.GetLeader();
+                if (unit.leader == unit){
+                    unit.isLeader = true;
                 }
             }
         }
