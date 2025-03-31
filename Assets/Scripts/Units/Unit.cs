@@ -68,10 +68,6 @@ namespace AgentScript
             floor = GameObject.Find("floor");
             bnd = floor.GetComponent<Renderer>().bounds;
             Search();
-
-            //leader = GetLeader();
-            //isLeader = (leader == this);
-
             ReceivedMessages = new Queue<Message>();
         }
 
@@ -91,9 +87,10 @@ namespace AgentScript
                 case BEHAVIOURS.WANDERING:
                     if (agent.remainingDistance == 0)
                     {
+                        agent.speed = movSpeed;
                         Search();
                     }
-                    Unit enemy = SeeEnemy(); // changer type à void ?
+                    Unit enemy = SeeEnemy();
                     break;
                 case BEHAVIOURS.GOING:
                     Go(); break;
@@ -170,9 +167,6 @@ namespace AgentScript
             {
                 SetRandomDestination();
             }
-
-            // Update the animator with the current velocity
-            _animator.SetFloat("Velocity", agent.velocity.magnitude);
         }
         void SetEnemy(Unit enemy)
         {
@@ -213,9 +207,10 @@ namespace AgentScript
                     this.currentBehaviour = BEHAVIOURS.ATTACKING;
                 }
             }
-
-            // Update the animator with the current velocity
-            _animator.SetFloat("Velocity", agent.velocity.magnitude);
+            else
+            {
+                currentBehaviour = BEHAVIOURS.WANDERING;
+            }
 
         }
 

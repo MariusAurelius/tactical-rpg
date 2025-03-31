@@ -545,7 +545,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: c5067d7e3d128469f93c8816fbc71963, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -611,19 +611,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isLeader: 0
   team: 0
-  maxHp: 7
-  currentHp: 7
-  atk: 2
-  atkSpeed: 1
-  atkReach: 5
-  movSpeed: 2
-  power: 10
+  perceivedPower: -1
   hasBeenAttacked: 0
   leader: {fileID: 0}
-  _animator: {fileID: 9549874}
   currentBehaviour: 0
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
+  _animator: {fileID: 9549874}
 --- !u!114 &-5203087193051569758
 MonoBehaviour:
   m_ObjectHideFlags: 0
