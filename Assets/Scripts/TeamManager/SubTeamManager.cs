@@ -24,7 +24,6 @@ public class SubTeamManager : MonoBehaviour
 
     void Update()
     {
-        // Vérifie si la touche 'C' est pressée pour créer les sous-équipes
         if (Input.GetKeyDown(KeyCode.C))
         {
             Debug.Log("Key Space pressed. Creating sub-teams...");
@@ -35,6 +34,10 @@ public class SubTeamManager : MonoBehaviour
         }
     }
 
+
+    ///<summary>
+    /// Méthode pour créer des sous-équipes
+    /// </summary>
     public void CreateSubTeams(TeamConfiguration config)
     {
         // Récupère toutes les unités sous l'objet parent de l'équipe
@@ -149,6 +152,11 @@ public class SubTeamManager : MonoBehaviour
         return -1;
     }
 
+
+    ///<summary>
+    // Méthode pour assigner un leader à une sous-équipe
+    // en fonction de la puissance de l'unité
+    /// </summary>
     public static void AssignLeader(int teamId, List<Unit> subTeam)
     {
         List<Unit> candidates = new List<Unit>();
