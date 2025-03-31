@@ -1383,7 +1383,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 142034}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -1408,6 +1408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55cff0d76ec85e7478d1d45c095f6f0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   isLeader: 0
   team: 0
   perceivedPower: -1
@@ -1417,6 +1418,7 @@ MonoBehaviour:
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
   _animator: {fileID: 9588702}
+  debugName: 
 --- !u!114 &-7344963056930183255
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -31,27 +31,26 @@ public class AnimationStateController : MonoBehaviour
         switch (_unit.currentBehaviour)
         {
             case Unit.BEHAVIOURS.WANDERING:
-                SetAnimatorParameters(isMoving: true, isAttacking: false, velocity: 0.2f);
+                SetAnimatorParameters(isMoving: true, isAttacking: false);
                 break;
             case Unit.BEHAVIOURS.GOING:
-                SetAnimatorParameters(isMoving: true, isAttacking: false, velocity: 1f);
+                SetAnimatorParameters(isMoving: true, isAttacking: false);
                 break;
 
             case Unit.BEHAVIOURS.ATTACKING:
-                SetAnimatorParameters(isMoving: false, isAttacking: true, velocity: 0f);
+                SetAnimatorParameters(isMoving: false, isAttacking: true);
                 break;
 
             default:
-                SetAnimatorParameters(isMoving: false, isAttacking: false, velocity: 0f);
+                SetAnimatorParameters(isMoving: false, isAttacking: false);
                 Debug.LogWarning("Unknown behaviour detected.");
                 break;
         }
     }
 
-    private void SetAnimatorParameters(bool isMoving, bool isAttacking, float velocity)
+    private void SetAnimatorParameters(bool isMoving, bool isAttacking)
     {
         _animator.SetBool("isMoving", isMoving);
         _animator.SetBool("isAttacking", isAttacking);
-        _animator.SetFloat("Velocity", velocity);
     }
 }

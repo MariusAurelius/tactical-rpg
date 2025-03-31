@@ -73,6 +73,14 @@ namespace AgentScript
 
         void Update()
         {
+            if (currentBehaviour == BEHAVIOURS.ATTACKING)
+        {
+            agent.isStopped = true; // Empêche le mouvement pendant l'attaque
+        }
+        else
+        {
+            agent.isStopped = false; // Autorise le mouvement dans les autres comportements
+        }
             // if (leader == null)
             // {
             //     leader = GetLeader();
@@ -85,9 +93,8 @@ namespace AgentScript
             switch (currentBehaviour)
             {
                 case BEHAVIOURS.WANDERING:
-                    if (agent.remainingDistance == 0)
+                    if (agent.remainingDistance == 0.5f)
                     {
-                        agent.speed = movSpeed;
                         Search();
                     }
                     Unit enemy = SeeEnemy();
@@ -104,6 +111,8 @@ namespace AgentScript
         {
             if (currentEnemy != null)
             {
+                agent.isStopped = true;
+
                 Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
@@ -123,6 +132,7 @@ namespace AgentScript
             else
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
+                agent.isStopped = false;
             }
         }
 
@@ -205,6 +215,7 @@ namespace AgentScript
                         currentEnemy.currentBehaviour = BEHAVIOURS.GOING;
                     }
                     this.currentBehaviour = BEHAVIOURS.ATTACKING;
+                    agent.isStopped = true;
                 }
             }
             else
@@ -219,11 +230,11 @@ namespace AgentScript
             this.currentHp -= dmgTaken;
             if (this.currentHp <= 0)
             {
+                List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
+                subTeam.Remove(this);
                 if (isLeader)
                 {
                     Debug.Log("Leader " + leader.gameObject.name + " died, trying to find new leader");
-                    List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
-                    subTeam.Remove(this);
                     SubTeamManager.AssignLeader((int)team, subTeam);
                     Debug.Log("Leader died, new leader assigned: " + leader.gameObject.name);
                 }
@@ -274,12 +285,6 @@ namespace AgentScript
             Debug.LogWarning("No leader found");
             return null;
 
-        }
-
-        public float GetVelocity()
-        {
-            // Retourne la vitesse normalisée de l'agent (entre 0 et 1)
-            return Mathf.Clamp01(agent.velocity.magnitude / agent.speed);
         }
 
 

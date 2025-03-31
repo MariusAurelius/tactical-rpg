@@ -2182,6 +2182,7 @@ GameObject:
   - component: {fileID: 3632600188266712723}
   - component: {fileID: 6656848217487894586}
   - component: {fileID: 6789833904437028591}
+  - component: {fileID: -4350461395016995243}
   m_Layer: 0
   m_Name: Peasent_Blue
   m_TagString: Untagged
@@ -2262,7 +2263,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 179034}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2287,6 +2288,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c049ff1e62a3024b86d355053b09bfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   isLeader: 0
   team: 0
   perceivedPower: -1
@@ -2296,6 +2298,7 @@ MonoBehaviour:
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
   _animator: {fileID: 9575092}
+  debugName: 
 --- !u!114 &6789833904437028591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2308,6 +2311,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-4350461395016995243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 179034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba2a40eaa3300421ebd58a5457e38c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 9575092}
 --- !u!1 &179540
 GameObject:
   m_ObjectHideFlags: 0

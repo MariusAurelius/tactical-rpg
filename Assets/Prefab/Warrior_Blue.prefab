@@ -2395,6 +2395,7 @@ GameObject:
   - component: {fileID: 818879669608276275}
   - component: {fileID: -1859271179134152684}
   - component: {fileID: 413812324261526014}
+  - component: {fileID: -4840386582554640844}
   m_Layer: 0
   m_Name: Warrior_Blue
   m_TagString: Untagged
@@ -2475,7 +2476,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 172688}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2500,6 +2501,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 577f83b32bf5f2149b460be12d4818f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   isLeader: 0
   team: 0
   perceivedPower: -1
@@ -2509,6 +2511,7 @@ MonoBehaviour:
   goal: {fileID: 0}
   currentEnemy: {fileID: 0}
   _animator: {fileID: 9523868}
+  debugName: 
 --- !u!114 &413812324261526014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2521,6 +2524,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 46429cf647ca144f4b8b3aba0f9004d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-4840386582554640844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 172688}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba2a40eaa3300421ebd58a5457e38c21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 9523868}
 --- !u!1 &172980
 GameObject:
   m_ObjectHideFlags: 0
