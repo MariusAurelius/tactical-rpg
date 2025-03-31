@@ -12,5 +12,6 @@ public class GoToMessage : Message
     public GoToMessage(Unit sender, Unit recipient, Vector3 destination) : base(sender, recipient)
     {
         this.destination = destination;
+        Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Go To Message, destination: " + destination);
     }
 }

@@ -12,5 +12,11 @@ public class ShareGroupStatusMessage : Message
     public int groupMaxHealth;
     public Vector3 groupCenter;
     public Vector3 groupDirection;
-    public ShareGroupStatusMessage(Unit sender, Unit recipient) : base(sender, recipient) { }
+    public ShareGroupStatusMessage(Unit sender, Unit recipient) : base(sender, recipient)
+    {
+        Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Share Group Status Message" +
+                  ". groupSize: " + groupSize + ", initialGroupSize: " + initialGroupSize +
+                  ", groupHealth: " + groupHealth + ", groupMaxHealth: " + groupMaxHealth +
+                  ", groupCenter: " + groupCenter + ", groupDirection: " + groupDirection);
+    }
 }

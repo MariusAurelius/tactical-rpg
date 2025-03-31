@@ -11,5 +11,6 @@ public class SpottedEnemyMessage : Message
     public SpottedEnemyMessage(Unit sender, Unit recipient, Unit enemy) : base(sender, recipient)
     {
         this.enemy = enemy;
+        Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Spotted Enemy Message, enemy: " + enemy.debugName);
     }
 }

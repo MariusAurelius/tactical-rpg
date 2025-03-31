@@ -1,4 +1,5 @@
 ﻿using AgentScript;
+using UnityEngine;
 
 /// <summary>
 /// A message that tells a unit (the recipient) to attack an enemy.
@@ -12,5 +13,6 @@ public class AttackEnemyMessage : Message
     {
         // enemyPos = pos;
         this.enemy = enemy; 
+        Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Attack Enemy Message, enemy: " + enemy.debugName);
     }
 }

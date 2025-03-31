@@ -52,6 +52,7 @@ public class RedTeamSpawner : MonoBehaviour
 
     void SpawnCharacters()
     {
+        int unit_id = 1;
         foreach (var composition in compositions)
         {
             GameObject prefab = GetPrefabByCharacterType(composition.type);
@@ -67,7 +68,10 @@ public class RedTeamSpawner : MonoBehaviour
                 Unit unitComponent = character.GetComponent<Unit>();
                 if (unitComponent != null)
                 {
-                    unitComponent.team = 1; // Team ID for red team
+                    unitComponent.team = Team.RED; // Team ID for red team
+                    unitComponent.id = unit_id;
+                    unit_id+=2; // équipe bleue: que des id impairs
+                    character.name = $"Red_{composition.type.Name}({unitComponent.id})";
                 }
 
                 // Assign the character to the team parent object

@@ -12,8 +12,15 @@ public abstract class Message
     {
         this.sender = sender;
         this.recipient = recipient;
-
-        Debug.Log("Message sent from " + sender.gameObject.name + " to " + recipient.gameObject.name + ": " + this.GetType().Name);
+        if (sender == null)
+        {
+            Debug.LogError(this.GetType().Name + ": Sender is null, recipient is " + recipient.gameObject.name);
+        }
+        if (recipient == null)
+        {
+            Debug.LogError(this.GetType().Name + ": Recipient is null, sender is " + sender.gameObject.name);
+        }
+        // Debug.Log("Message sent from " + sender.gameObject.name + " to " + recipient.gameObject.name + ": " + this.GetType().Name);
     }
 }
 

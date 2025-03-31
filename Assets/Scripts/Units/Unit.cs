@@ -6,10 +6,14 @@ using UnityEngine.AI;
 
 namespace AgentScript
 {
+    public enum Team:int
+    {
+        RED = 1,
+        BLUE = 2
+    }
+
     public class Unit : MonoBehaviour
     {
-
-
         public enum BEHAVIOURS
         {
             WANDERING,
@@ -17,14 +21,10 @@ namespace AgentScript
             ATTACKING
         }
 
-        public enum Team
-        {
-            BLUE,
-            RED
-        }
+        public int id;
 
         public bool isLeader;
-        public int team; // Team team
+        public Team team;
         protected int maxHp = 0;
         protected int currentHp = 0;
         protected int atk;
@@ -56,8 +56,14 @@ namespace AgentScript
 
         public Queue<Message> ReceivedMessages;
 
+        /// <summary>
+        /// The unit's color, type, id, and subteam id for logging and debugging.
+        /// </summary>
+        public string debugName;
+
         void Start()
         {
+
             agent = this.GetComponent<NavMeshAgent>();
             floor = GameObject.Find("floor");
             bnd = floor.GetComponent<Renderer>().bounds;
@@ -71,11 +77,11 @@ namespace AgentScript
 
         void Update()
         {
-            if (leader == null)
-            {
-                leader = GetLeader();
-                isLeader = (leader == this);
-            }
+            // if (leader == null)
+            // {
+            //     leader = GetLeader();
+            //     isLeader = (leader == this);
+            // }
             if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
@@ -87,14 +93,7 @@ namespace AgentScript
                     {
                         Search();
                     }
-                    Unit enemy = SeeEnemy();
-                    if (enemy != null)
-                    {
-                        if (enemy.team != this.team)
-                        {
-                        SendMessage(new SpottedEnemyMessage(this, leader, enemy));
-                        }
-                    }
+                    Unit enemy = SeeEnemy(); // changer type à void ?
                     break;
                 case BEHAVIOURS.GOING:
                     Go(); break;
@@ -108,7 +107,6 @@ namespace AgentScript
         {
             if (currentEnemy != null)
             {
-                
                 Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
@@ -149,18 +147,21 @@ namespace AgentScript
                 {
                     Unit unit = raycastInfo.collider.GetComponent<Unit>();
 
-                    if (unit != null)
+                    if (unit != null && IsEnemy(unit))
                     {
-
-                        Debug.Log("Enemy seen");
-
-                        Debug.Log(raycastInfo.collider.GetComponent<Unit>());
+                        Debug.Log("Enemy seen: " + unit);
+                        SendMessage(new SpottedEnemyMessage(this, leader, unit));
                         return unit;
                     }
                 }
             }
             return null;
 
+        }
+
+        public bool IsEnemy(Unit unit)
+        {
+            return unit.team != this.team;
         }
 
         void Search()
@@ -223,6 +224,14 @@ namespace AgentScript
             this.currentHp -= dmgTaken;
             if (this.currentHp <= 0)
             {
+                if (isLeader)
+                {
+                    Debug.Log("Leader " + leader.gameObject.name + " died, trying to find new leader");
+                    List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
+                    subTeam.Remove(this);
+                    SubTeamManager.AssignLeader((int)team, subTeam);
+                    Debug.Log("Leader died, new leader assigned: " + leader.gameObject.name);
+                }
                 Destroy(this.gameObject);
                 return;
             }
@@ -255,7 +264,8 @@ namespace AgentScript
         }
 
 
-        public Unit GetLeader() {
+        public Unit GetLeader()
+        {
             Debug.Log(transform.parent.name);
             foreach (Transform child in transform.parent)
             {
@@ -386,31 +396,31 @@ namespace AgentScript
         /// <param name="askForHelp"></param>
         private void HandleAskForHelp(AskForHelp askForHelp)
         {
-                // gather power of nearby troops
-                List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
-                List<Unit> availableNearbyTroops = new();
-                int combinedPower = 0;
-                foreach (Unit unit in nearbyTroops)
-                { // instead do it with a message that is a coroutine
-                    if (unit.currentBehaviour != BEHAVIOURS.ATTACKING || unit.currentEnemy == askForHelp.enemy) // if not currently attacking a different enemy
-                    {
-                        combinedPower += unit.GetPower();
-                        availableNearbyTroops.Add(unit);
-                    }
+            // gather power of nearby troops
+            List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
+            List<Unit> availableNearbyTroops = new();
+            int combinedPower = 0;
+            foreach (Unit unit in nearbyTroops)
+            { // instead do it with a message that is a coroutine
+                if (unit.currentBehaviour != BEHAVIOURS.ATTACKING || unit.currentEnemy == askForHelp.enemy) // if not currently attacking a different enemy
+                {
+                    combinedPower += unit.GetPower();
+                    availableNearbyTroops.Add(unit);
                 }
+            }
 
-                if (combinedPower >= askForHelp.enemy.perceivedPower) // if enough power to attack enemy
+            if (combinedPower >= askForHelp.enemy.perceivedPower) // if enough power to attack enemy
+            {
+                foreach (var friend in availableNearbyTroops)
                 {
-                    foreach (var friend in availableNearbyTroops)
-                    {
-                        SendMessage(new AttackEnemyMessage(this, friend, askForHelp.enemy));
-                    }
-                    SetEnemy(askForHelp.enemy);
+                    SendMessage(new AttackEnemyMessage(this, friend, askForHelp.enemy));
                 }
-                else
-                {
-                    Retreat();
-                }
+                SetEnemy(askForHelp.enemy);
+            }
+            else
+            {
+                Retreat();
+            }
         }
 
         /// <summary>
@@ -450,7 +460,7 @@ namespace AgentScript
             if (currentBehaviour != BEHAVIOURS.ATTACKING)
             {
                 SetEnemy(needHelpMessage.sender.currentEnemy);
-                
+
             }
         }
 
@@ -458,7 +468,8 @@ namespace AgentScript
         /// Retreats to leader after receiving the order to retreat.
         /// </summary>
         /// <param name="retreatMessage"></param>
-        private void HandleRetreat(RetreatMessage retreatMessage) {
+        private void HandleRetreat(RetreatMessage retreatMessage)
+        {
             Retreat();
         }
 
@@ -482,7 +493,7 @@ namespace AgentScript
                 Debug.LogWarning("position shared to a unit that is not a leader");
                 return;
             }
-            
+
             throw new NotImplementedException();
         }
 
@@ -511,12 +522,13 @@ namespace AgentScript
                     // SendMessage(new RetreatMessage(this, spottedEnemyMessage.sender));
                 }
             }
-            else {
+            else
+            {
                 Debug.LogWarning("SpottedEnemyMessage received by a unit that is not a leader");
-            } 
+            }
         }
 
-        
+
 
 
         // ...

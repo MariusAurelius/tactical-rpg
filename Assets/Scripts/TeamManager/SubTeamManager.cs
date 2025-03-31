@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using AgentScript;
+using System.Linq;
 
 [System.Serializable]
 public class TeamConfiguration
@@ -18,8 +19,8 @@ public class SubTeamManager : MonoBehaviour
 {
     public List<TeamConfiguration> teamConfigurations; // Liste des configurations d'équipe
 
-    public static Dictionary<int, List<List<Unit>>> subTeams = new Dictionary<int, List<List<Unit>>>(); // Dictionnaire des sous-équipes par équipe
-    public static Dictionary<int, Unit> subTeamLeaders = new Dictionary<int, Unit>(); // Dictionnaire des leaders de sous-équipes par équipe
+    public static Dictionary<int, Dictionary<int, List<Unit>>> subTeams = new(); // Dictionnaire des sous-équipes par équipe, avec le numéro de chaque sous-équipe comme identifiant de la sous-équipe
+    public static Dictionary<int, Unit> subTeamLeaders = new(); // Dictionnaire des leaders de sous-équipes par équipe
 
     void Update()
     {
@@ -59,7 +60,7 @@ public class SubTeamManager : MonoBehaviour
         // Efface les sous-équipes existantes pour l'équipe
         if (!subTeams.ContainsKey(config.teamId))
         {
-            subTeams[config.teamId] = new List<List<Unit>>();
+            subTeams[config.teamId] = new();
         }
         else
         {
@@ -76,7 +77,7 @@ public class SubTeamManager : MonoBehaviour
         Debug.Log($"Creating {config.subTeamCount} sub-teams for team {config.teamId} with {unitsPerSubTeam} units per sub-team and {extraUnits} extra units.");
         for (int i = 0; i < config.subTeamCount; i++)
         {
-            subTeams[config.teamId].Add(new List<Unit>());
+            subTeams[config.teamId].Add(i+1, new List<Unit>());
 
             // Crée un nouvel objet GameObject pour la sous-équipe
             GameObject subTeamObject = new GameObject($"SubTeam_{config.teamId}_{i + 1}");
@@ -90,7 +91,7 @@ public class SubTeamManager : MonoBehaviour
             int currentSubTeamSize = unitsPerSubTeam + (i < extraUnits ? 1 : 0);
             for (int j = 0; j < currentSubTeamSize; j++)
             {
-                subTeams[config.teamId][i].Add(units[unitIndex]);
+                subTeams[config.teamId][i+1].Add(units[unitIndex]);
 
                 // Assigne l'unité à l'objet GameObject de la sous-équipe
                 units[unitIndex].transform.parent = config.teamParent.Find($"SubTeam_{config.teamId}_{i + 1}");
@@ -99,23 +100,53 @@ public class SubTeamManager : MonoBehaviour
         }
 
         // Assigne des leaders pour chaque sous-équipe
-        foreach (var subTeam in subTeams[config.teamId])
+        foreach (var (subTeamIndex, subTeam) in subTeams[config.teamId])
         {
+            foreach (var unit in subTeam)
+            {
+                unit.debugName = $"{unit.gameObject.name}(subteam {subTeamIndex})";
+            }
             AssignLeader(config.teamId, subTeam);
         }
 
         // Assigne le leader à chaque unité dans la sous-équipe
-        foreach (var subTeam in subTeams[config.teamId])
+            // rajouté dans le code assign leader
+        // foreach (var subTeam in subTeams[config.teamId])
+        // {
+        //     Unit leader = subTeam.Find(unit => unit.isLeader);
+        //     foreach (var unit in subTeam)
+        //     {
+                
+        //             unit.leader = leader;
+                
+        //     }
+        // }
+    }
+
+    public static List<Unit> GetSubTeam(Unit unit)
+    {
+        foreach (var (_, subTeam) in subTeams[(int)unit.team])
         {
-            Unit leader = subTeam.Find(unit => unit.isLeader);
-            foreach (var unit in subTeam)
+            if (!(subTeam.Count == 0) && subTeam.First().leader == unit.leader)
             {
-                if (!unit.isLeader) // Vérifie si l'unité n'est pas le leader
-                {
-                    unit.leader = leader;
-                }
+                return subTeam;
             }
         }
+        Debug.LogWarning("Unit not found in any sub-team.");
+        return null;
+    }
+
+    public static int GetSubTeamId(Unit unit)
+    {
+        foreach (var (subTeamId, subTeam) in subTeams[(int)unit.team])
+        {
+            if (!(subTeam.Count == 0) && subTeam.First().leader == unit.leader)
+            {
+                return subTeamId;
+            }
+        }
+        Debug.LogWarning("Unit not found in any sub-team.");
+        return -1;
     }
 
     public static void AssignLeader(int teamId, List<Unit> subTeam)
@@ -126,15 +157,18 @@ public class SubTeamManager : MonoBehaviour
         // Trouve les candidats pour le leader en fonction de la puissance
         foreach (Unit unit in subTeam)
         {
-            if (unit.GetPower() > maxPower)
-            {
-                maxPower = unit.GetPower();
-                candidates.Clear();
-                candidates.Add(unit);
-            }
-            else if (unit.GetPower() == maxPower)
-            {
-                candidates.Add(unit);
+            if (unit.gameObject != null)
+            {    
+                if (unit.GetPower() > maxPower)
+                {
+                    maxPower = unit.GetPower();
+                    candidates.Clear();
+                    candidates.Add(unit);
+                }
+                else if (unit.GetPower() == maxPower)
+                {
+                    candidates.Add(unit);
+                }
             }
         }
 
@@ -145,7 +179,17 @@ public class SubTeamManager : MonoBehaviour
             leader.isLeader = true;
             leader.gameObject.tag = "Leader"; // Ajoute le tag "Leader"
             subTeamLeaders[teamId] = leader;
-            Debug.Log($"Leader assigned for team {teamId}: {leader.name}");
+
+            foreach (var unit in subTeam)
+            {
+                unit.leader = leader;   
+            }
+
+            Debug.Log($"Sub Team Leader assigned for team {teamId}, subteam {GetSubTeamId(leader)}: {leader.name}");
+        }
+        else
+        {
+            Debug.LogWarning("No leader found for sub-team.");
         }
     }
 }

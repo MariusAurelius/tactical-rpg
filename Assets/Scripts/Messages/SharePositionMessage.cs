@@ -11,5 +11,6 @@ public class SharePositionMessage : Message
     public SharePositionMessage(Unit sender, Unit recipient) : base(sender, recipient)
     {
         position = sender.gameObject.transform.position;
+        Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Share Position Message, position: " + position);
     }
 }
