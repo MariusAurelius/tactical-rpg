@@ -32,6 +32,9 @@ namespace AgentScript
         protected int atkReach;
         protected float attackCooldown = 0f;
 
+        [SerializeField] private float visionAngle = 60f; // Angle de vision en degrés
+        [SerializeField] private float visionRange = 100f; // Portée de vision
+
         protected float movSpeed;
 
         protected int power;
@@ -144,27 +147,88 @@ namespace AgentScript
             agent.SetDestination(moveto);
         }
 
+        // Unit SeeEnemy()
+        // {
+        //     RaycastHit raycastInfo;
+        //     Vector3 rayToTarget = agent.destination - agent.transform.position;
+        //     if (Physics.Raycast(this.transform.position, rayToTarget, out raycastInfo))
+        //     {
+        //         if (raycastInfo.collider != null)
+        //         {
+        //             Unit unit = raycastInfo.collider.GetComponent<Unit>();
+
+        //             if (unit != null && IsEnemy(unit))
+        //             {
+        //                 Debug.Log("Enemy seen: " + unit);
+        //                 SendMessage(new SpottedEnemyMessage(this, leader, unit));
+        //                 return unit;
+        //             }
+        //         }
+        //     }
+        //     return null;
+
+        // }
+
         Unit SeeEnemy()
         {
-            RaycastHit raycastInfo;
-            Vector3 rayToTarget = agent.destination - agent.transform.position;
-            if (Physics.Raycast(this.transform.position, rayToTarget, out raycastInfo))
+            Collider[] colliders = Physics.OverlapSphere(transform.position, visionRange); // Détecte tous les objets dans la portée
+            foreach (Collider collider in colliders)
             {
-                if (raycastInfo.collider != null)
+                Unit unit = collider.GetComponent<Unit>();
+                if (unit != null && IsEnemy(unit))
                 {
-                    Unit unit = raycastInfo.collider.GetComponent<Unit>();
+                    // Vérifie si l'unité est dans le champ de vision
+                    Vector3 directionToUnit = (unit.transform.position - transform.position).normalized;
+                    float angleToUnit = Vector3.Angle(transform.forward, directionToUnit);
 
-                    if (unit != null && IsEnemy(unit))
+                    if (angleToUnit <= visionAngle / 2) // Si l'unité est dans l'angle de vision
                     {
-                        Debug.Log("Enemy seen: " + unit);
-                        SendMessage(new SpottedEnemyMessage(this, leader, unit));
-                        return unit;
+                        // Vérifie si un obstacle bloque la ligne de vue
+                        Ray ray = new Ray(transform.position, directionToUnit);
+                        Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.red, 0.1f); // Visualise le raycast
+                        if (Physics.Raycast(ray, out RaycastHit hit, visionRange))
+                        {
+                            if (hit.collider.gameObject == unit.gameObject) // Si le raycast touche l'unité
+                            {
+                                Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.green, 0.1f); // Rayon vert si l'ennemi est visible
+                                Debug.Log("Enemy seen: " + unit);
+                                SendMessage(new SpottedEnemyMessage(this, leader, unit));
+                                return unit;
+                            }
+                            else
+                            {
+                                Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.red, 0.1f); // Rayon rouge si un obstacle bloque la vue
+                                Debug.Log("Enemy blocked by obstacle: " + hit.collider.gameObject.name);
+                            }
+                        }
                     }
                 }
             }
             return null;
-
         }
+
+
+        /// <summary>
+        /// Draws the vision range and angle in the editor.
+        /// </summary>
+        // private void OnDrawGizmos()
+        // {
+        //     // Dessine la portée de vision
+        //     Gizmos.color = Color.yellow;
+        //     Gizmos.DrawWireSphere(transform.position, visionRange);
+
+        //     // Dessine le cône de vision
+        //     Vector3 forward = transform.forward * visionRange;
+        //     Quaternion leftRayRotation = Quaternion.Euler(0, -visionAngle / 2, 0);
+        //     Quaternion rightRayRotation = Quaternion.Euler(0, visionAngle / 2, 0);
+
+        //     Vector3 leftRayDirection = leftRayRotation * forward;
+        //     Vector3 rightRayDirection = rightRayRotation * forward;
+
+        //     Gizmos.color = Color.blue;
+        //     Gizmos.DrawRay(transform.position, leftRayDirection);
+        //     Gizmos.DrawRay(transform.position, rightRayDirection);
+        // }
 
         public bool IsEnemy(Unit unit)
         {

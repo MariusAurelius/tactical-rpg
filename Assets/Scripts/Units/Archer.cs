@@ -9,7 +9,7 @@ public class Archer : Unit
         this.currentHp = this.maxHp;
         this.atk = 2;
         this.atkSpeed = 1;
-        this.atkReach = 5;
+        this.atkReach = 20;
 
         this.movSpeed = 2;
 

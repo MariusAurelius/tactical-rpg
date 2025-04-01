@@ -9,7 +9,7 @@ public class Warrior : Unit
         this.currentHp = this.maxHp;
         this.atk = 2;
         this.atkSpeed = 1;
-        this.atkReach = 5;
+        this.atkReach = 2;
 
         this.movSpeed = 2;
 
