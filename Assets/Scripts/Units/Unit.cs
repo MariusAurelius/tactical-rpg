@@ -32,8 +32,11 @@ namespace AgentScript
         protected int atkReach;
         protected float attackCooldown = 0f;
 
-        [SerializeField] private float visionAngle = 60f; // Angle de vision en degrés
-        [SerializeField] private float visionRange = 100f; // Portée de vision
+        private float visionAngle = 60f; // Angle de vision en degrés
+        private float visionRange = 100f; // Portée de vision
+
+        private AttackLineRenderer attackLineRenderer;
+
 
         protected float movSpeed;
 
@@ -72,6 +75,9 @@ namespace AgentScript
             bnd = floor.GetComponent<Renderer>().bounds;
             Search();
             ReceivedMessages = new Queue<Message>();
+
+            // Initialisation du VisionLineRenderer
+            attackLineRenderer = new AttackLineRenderer(gameObject);
         }
 
         void Update()
@@ -114,17 +120,39 @@ namespace AgentScript
         {
             if (currentEnemy != null)
             {
+                // Vérifie si l'ennemi est toujours à portée
+                float distanceToEnemy = Vector3.Distance(transform.position, currentEnemy.transform.position);
+                if (distanceToEnemy > atkReach)
+                {
+                    Debug.Log("Enemy out of range. Stopping attack.");
+                    ClearEnemy(); // Arrête l'attaque et réinitialise l'état
+                    attackLineRenderer.ToggleLine(false); // Désactive le trait bleu
+                    return;
+                }
+
+                // Vérifie si l'ennemi est toujours visible
+                if (!IsEnemyVisible(currentEnemy))
+                {
+                    Debug.Log("Enemy no longer visible. Stopping attack.");
+                    ClearEnemy(); // Arrête l'attaque et réinitialise l'état
+                    attackLineRenderer.ToggleLine(false); // Désactive le trait bleu
+                    return;
+                }
+
                 agent.isStopped = true;
 
+                // Tourne vers l'ennemi
                 Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
 
+                // Active le trait bleu
+                attackLineRenderer.ToggleLine(true, transform.position, currentEnemy.transform.position);
+
                 if (attackCooldown <= 0f)
                 {
                     currentEnemy.ReduceHp(this.atk);
-                    attackCooldown = 1f / atkSpeed;  // Cooldown based on attack speed
-
+                    attackCooldown = 1f / atkSpeed;  // Cooldown basé sur la vitesse d'attaque
                     currentEnemy.hasBeenAttacked = true;
                 }
                 else
@@ -136,6 +164,7 @@ namespace AgentScript
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
                 agent.isStopped = false;
+                attackLineRenderer.ToggleLine(false); // Désactive le trait bleu si aucun ennemi
             }
         }
 
@@ -146,6 +175,7 @@ namespace AgentScript
             Vector3 moveto = new Vector3(rx, this.transform.position.y, rz);
             agent.SetDestination(moveto);
         }
+        
 
         // Unit SeeEnemy()
         // {
@@ -198,7 +228,7 @@ namespace AgentScript
                             else
                             {
                                 Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.red, 0.1f); // Rayon rouge si un obstacle bloque la vue
-                                Debug.Log("Enemy blocked by obstacle: " + hit.collider.gameObject.name);
+                                //Debug.Log("Enemy blocked by obstacle: " + hit.collider.gameObject.name);
                             }
                         }
                     }
@@ -252,6 +282,9 @@ namespace AgentScript
         {
             currentEnemy = null;
             currentBehaviour = BEHAVIOURS.WANDERING;
+            agent.isStopped = false;
+
+            attackLineRenderer.ToggleLine(false); // Désactive le trait bleu
         }
 
         void Retreat()
@@ -294,6 +327,8 @@ namespace AgentScript
             this.currentHp -= dmgTaken;
             if (this.currentHp <= 0)
             {
+                // Désactive le trait bleu avant de détruire l'unité
+                attackLineRenderer.ToggleLine(false);
                 List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
                 subTeam.Remove(this);
                 if (isLeader)
@@ -302,6 +337,7 @@ namespace AgentScript
                     SubTeamManager.AssignLeader((int)team, subTeam);
                     Debug.Log("Leader died, new leader assigned: " + leader.gameObject.name);
                 }
+                
                 Destroy(this.gameObject);
                 return;
             }
@@ -334,6 +370,29 @@ namespace AgentScript
         }
 
 
+        bool IsEnemyVisible(Unit enemy)
+        {
+            Vector3 directionToEnemy = (enemy.transform.position - transform.position).normalized;
+            float angleToEnemy = Vector3.Angle(transform.forward, directionToEnemy);
+
+            // Vérifie si l'ennemi est dans le champ de vision
+            if (angleToEnemy <= visionAngle / 2)
+            {
+                // Vérifie si un obstacle bloque la ligne de vue
+                Ray ray = new Ray(transform.position, directionToEnemy);
+                if (Physics.Raycast(ray, out RaycastHit hit, visionRange))
+                {
+                    if (hit.collider.gameObject == enemy.gameObject) // Si le raycast touche l'ennemi
+                    {
+                        return true; // L'ennemi est visible
+                    }
+                }
+            }
+
+            return false; // L'ennemi n'est pas visible
+        }
+
+
         public Unit GetLeader()
         {
             Debug.Log(transform.parent.name);
@@ -355,7 +414,7 @@ namespace AgentScript
         public List<Unit> GetFriendlyTroopsNearby()
         {
             List<Unit> units = new();
-            float rangeRadius = 5f;
+            float rangeRadius = 40f;
 
             foreach (Transform child in transform.parent)
             {

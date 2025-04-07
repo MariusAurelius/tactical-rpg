@@ -2496,7 +2496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   warriorPrefab: {fileID: 3583581354743002515, guid: f1a57ae3ea21b4560b36fc55a6cf6830, type: 3}
-  peasantPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
+  peasantPrefab: {fileID: 4428492859242982671, guid: 49d6fcf8abe834d9688e9b71de30ca22, type: 3}
   archerPrefab: {fileID: 4480984088472025493, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
   spawnPoint: {fileID: 1312100707}
   teamParent: {fileID: 1421173516}
@@ -3556,7 +3556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   warriorPrefab: {fileID: 8262471557189843758, guid: 40159d8f151fd43348408ebfb2a68ed7, type: 3}
-  peasantPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
+  peasantPrefab: {fileID: 5545454582595892986, guid: 9cdc08933c6694a338969566a1c25bf9, type: 3}
   archerPrefab: {fileID: 8352160061908802410, guid: 76fa2b41499a444c0a4229be502eb12a, type: 3}
   spawnPoint: {fileID: 1936128277}
   teamParent: {fileID: 344082331}
