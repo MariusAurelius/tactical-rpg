@@ -824,7 +824,13 @@ PlayerSettings:
   XboxOneOverrideIdentityPublisher: 
   vrEditorSettings: {}
   cloudServicesEnabled:
+    Build: 0
+    Game Performance: 0
+    Legacy Analytics: 0
+    Purchasing: 0
+    UDP: 0
     UNet: 1
+    Unity Ads: 0
   luminIcon:
     m_Name: 
     m_ModelFolderPath: 
@@ -844,11 +850,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 0
   windowsGamepadBackendHint: 0
-  cloudProjectId: bf9e69d2-155d-4a5a-8cc5-9cd64f75fda0
+  cloudProjectId: e5aad51b-88e5-424b-ab99-a60a81f5a892
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: tactical-rpg
-  organizationId: sugomamogus
+  organizationId: unity_zvfzdi2gqo6p-w
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
