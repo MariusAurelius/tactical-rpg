@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 namespace AgentScript
 {
-    public enum Team:int
+    public enum Team : int
     {
         RED = 1,
         BLUE = 2
@@ -21,33 +21,82 @@ namespace AgentScript
             ATTACKING
         }
 
+        /// <summary>
+        /// The unique identifier of this unit.
+        /// </summary>
         public int id;
 
+        /// <summary>
+        /// Is this unit a sub-team leader?
+        /// </summary>
         public bool isLeader;
+
+        /// <summary>
+        /// The overall team this unit belongs to. (e.g. RED or BLUE)
+        /// </summary>
         public Team team;
+
+        /// <summary>
+        /// The starting health points of this unit.
+        /// </summary>
         protected int maxHp = 0;
+
+        /// <summary>
+        /// The current health points of this unit.
+        /// </summary>
         protected int currentHp = 0;
+
+        /// <summary>
+        /// The amount of damage this unit inflicts on an enemy.
+        /// </summary>
         protected int atk;
-        protected int atkSpeed;
+
+        /// <summary>
+        /// How fast this unit's attacks are, directly influencing the attack cooldown.
+        /// </summary>
+        /// <remarks>
+        /// The higher the value, the faster the unit attacks.
+        /// </remarks>
+        protected float atkSpeed;
+
+        /// <summary>
+        /// The reach of this unit's attacks, or from what distance it can attack an enemy.
+        /// </summary>
         protected int atkReach;
+
+        /// <summary>
+        /// The cooldown between attacks, in seconds.
+        /// </summary>
         protected float attackCooldown = 0f;
 
+        /// <summary>
+        /// The speed at which this unit moves.
+        /// </summary>
         protected float movSpeed;
 
+        /// <summary>
+        /// The power of this unit, used to determine if it can attack an enemy or not.
+        /// </summary>
         protected int power;
 
+        /// <summary>
+        /// The power of this unit as perceived by the enemy.
+        /// </summary>
         public int perceivedPower = -1; // unknown to enemy
 
+        /// <summary>
+        /// Has this unit been attacked by an enemy?
+        /// </summary>
+        /// <remarks>
+        /// If true, then this unit's hp is known to the enemy.
+        /// </remarks>
         public bool hasBeenAttacked;
 
         public Unit leader;
 
         //Agent
         private NavMeshAgent agent;
-        private GameObject floor = null;
-        private Bounds bnd;
         public BEHAVIOURS currentBehaviour = BEHAVIOURS.WANDERING;
-        public GameObject goal;
         public Unit currentEnemy;
 
         [Header("Animations")]
@@ -65,19 +114,17 @@ namespace AgentScript
         {
 
             agent = this.GetComponent<NavMeshAgent>();
-            floor = GameObject.Find("floor");
-            bnd = floor.GetComponent<Renderer>().bounds;
             Search();
             ReceivedMessages = new Queue<Message>();
         }
 
         void Update()
         {
-            // if (leader == null)
-            // {
-            //     leader = GetLeader();
-            //     isLeader = (leader == this);
-            // }
+            if (isLeader && agent.destination == null)
+            {
+                Debug.Log("hiyaaaaaaa");
+                SetRandomDestination();
+            }
             if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
@@ -90,13 +137,13 @@ namespace AgentScript
                         agent.speed = movSpeed;
                         Search();
                     }
-                    Unit enemy = SeeEnemy();
+                    SeeEnemy();
                     break;
                 case BEHAVIOURS.GOING:
                     Go(); break;
                 case BEHAVIOURS.ATTACKING:
                     Attack(); break;
-                default: throw new Exception("Unknown behaviour"); //break;
+                default: throw new Exception("Unknown behaviour");
             }
         }
 
@@ -126,12 +173,49 @@ namespace AgentScript
             }
         }
 
-        void SetRandomDestination()
+        public void SetRandomDestination()
         {
-            float rx = UnityEngine.Random.Range(-50, 50);
-            float rz = UnityEngine.Random.Range(-50, 50);
-            Vector3 moveto = new Vector3(rx, this.transform.position.y, rz);
-            agent.SetDestination(moveto);
+            SetRandomDestination(-50f, 50f, -50f, 50f);
+        }
+
+        void SetRandomDestination(float minX, float maxX, float minZ, float maxZ)
+        {
+            Debug.Log(debugName + ": SetRandomDestination() called");
+            if (agent == null)
+            {
+                Debug.LogError($"{debugName}: NavMeshAgent is null. Cannot set random destination.");
+                return;
+            }
+            if (!agent.isActiveAndEnabled)
+            {
+                Debug.LogError($"{debugName}: NavMeshAgent is not active or enabled.");
+                return;
+            }
+            
+            Vector3 moveto;
+            int maxAttempts = 10; // Limit the number of attempts to find a valid destination
+            int attempts = 0;
+
+            do
+            {
+            float rx = UnityEngine.Random.Range(minX, maxX);
+            float rz = UnityEngine.Random.Range(minZ, maxZ);
+            moveto = new Vector3(rx, transform.position.y, rz);
+
+            NavMeshPath path = new();
+            agent.CalculatePath(moveto, path);
+
+            if (path.status == NavMeshPathStatus.PathComplete)
+            {
+                agent.SetDestination(moveto);
+                Debug.Log(debugName + ": Valid destination set to " + moveto);
+                return;
+            }
+
+            attempts++;
+            } while (attempts < maxAttempts);
+
+            Debug.LogWarning(debugName + ": Unable to find a valid destination after " + maxAttempts + " attempts.");
         }
 
         Unit SeeEnemy()
@@ -144,9 +228,8 @@ namespace AgentScript
                 {
                     Unit unit = raycastInfo.collider.GetComponent<Unit>();
 
-                    if (unit != null && IsEnemy(unit))
+                    if (unit != null && IsEnemy(unit) && currentBehaviour != BEHAVIOURS.ATTACKING) // if sees enemy and we aren't already attacking
                     {
-                        Debug.Log("Enemy seen: " + unit);
                         SendMessage(new SpottedEnemyMessage(this, leader, unit));
                         return unit;
                     }
@@ -165,7 +248,29 @@ namespace AgentScript
         {
             if (agent.remainingDistance < 5f)
             {
-                SetRandomDestination();
+                if (isLeader)
+                {
+                    Debug.Log("pog");
+                    SendMessage(new ReachedDestinationMessage(this, this)); // could del this: called below as well
+                    SetRandomDestination();
+                }
+                else
+                {
+                    if (leader != null)
+                    {
+                        if (agent.destination == leader.agent.destination)
+                        {
+                            // agent.SetDestination(leader.transform.position);
+                            // AskLeaderForDestination();
+                            SendMessage(new ReachedDestinationMessage(this, leader));
+                        }
+                        else
+                        {
+                            agent.SetDestination(leader.agent.destination);
+                            // AskLeaderForDestination();
+                        }
+                    }
+                }
             }
         }
         void SetEnemy(Unit enemy)
@@ -192,7 +297,6 @@ namespace AgentScript
             {
                 agent.SetDestination(currentEnemy.transform.position);
 
-                // Debug.Log(agent.remainingDistance < this.atkReach);
                 if (agent.remainingDistance < this.atkReach)
                 {
                     if (currentEnemy.currentEnemy == null) // if enemy is not already attacking someone else
@@ -201,7 +305,6 @@ namespace AgentScript
                     }
                     if (currentEnemy.currentBehaviour != BEHAVIOURS.ATTACKING)
                     {
-
                         currentEnemy.currentBehaviour = BEHAVIOURS.GOING;
                     }
                     this.currentBehaviour = BEHAVIOURS.ATTACKING;
@@ -219,11 +322,32 @@ namespace AgentScript
             this.currentHp -= dmgTaken;
             if (this.currentHp <= 0)
             {
+                if (currentEnemy == null)
+                {
+                    Debug.LogError("currentEnemy is null, cannot update enemy's perceived power");
+                }
+                else
+                {
+                    if (currentEnemy.perceivedPower < this.power)
+                    {
+                        currentEnemy.perceivedPower = this.power;
+                    }
+                }
+                List<Unit> subTeam = SubTeamManager.GetSubTeam(this);
+                if (subTeam == null)
+                {
+                    Debug.LogWarning($"Subteam is null, cannot remove unit {debugName} from subteam list");
+                    return;
+                }
+
+                Debug.Log($"Before Remove: {string.Join(", ", subTeam)}");
+                bool removed = subTeam.Remove(this);
+                Debug.Log(removed ? "successfully removed unit from subteam list" : "could not remove unit from subteam list" + $". After Remove: {string.Join(", ", subTeam)}");
+
                 if (isLeader)
                 {
                     Debug.Log("Leader " + leader.gameObject.name + " died, trying to find new leader");
-                    List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
-                    subTeam.Remove(this);
+
                     SubTeamManager.AssignLeader((int)team, subTeam);
                     Debug.Log("Leader died, new leader assigned: " + leader.gameObject.name);
                 }
@@ -253,28 +377,11 @@ namespace AgentScript
             return -1;
         }
 
-        public bool isLowHp()
+        public bool IsLowHp()
         {
             return GetHPPercentage() < 30;
         }
 
-
-        public Unit GetLeader()
-        {
-            Debug.Log(transform.parent.name);
-            foreach (Transform child in transform.parent)
-            {
-                Debug.Log(child.name);
-                if (child.CompareTag("Leader"))
-                {
-                    Debug.LogWarning("Leader found");
-                    return child.GetComponent<Unit>();
-                }
-            }
-            Debug.LogWarning("No leader found");
-            return null;
-
-        }
 
         public float GetVelocity()
         {
@@ -316,15 +423,15 @@ namespace AgentScript
         /// </returns>
         public bool ShouldAttackEnemy(Unit enemy)
         {
-            if (enemy.currentEnemy != null && !enemy.currentEnemy.isLowHp() && enemy.currentEnemy.team == team) // if enemy is already attacking a friend that isn't low hp
+            if (enemy.currentEnemy != null && !enemy.currentEnemy.IsLowHp() && enemy.currentEnemy.team == team) // if enemy is already attacking a friend that isn't low hp
             {
-                return false;
+                return false; // ignore enemy if friend is already attacking it and isn't in trouble
             }
-            if (enemy.isLowHp() || enemy.perceivedPower <= this.power) // if power unknown or enemy is weaker / same power, or if enemy is low hp
+            if (enemy.IsLowHp() || enemy.perceivedPower <= this.power) // if power unknown or enemy is weaker / same power, or if enemy is low hp
             {
-                return true;
+                return true; // attack enemy
             }
-            return false;
+            return false; // ask for help
         }
 
         // envoi de messages
@@ -359,11 +466,17 @@ namespace AgentScript
                 case GoHelpMessage goHelpMessage:
                     HandleGoHelp(goHelpMessage);
                     break;
+                case GoToAreaMessage goToAreaMessage:
+                    HandleGoToArea(goToAreaMessage);
+                    break;
                 case GoToMessage goToMessage:
                     HandleGoTo(goToMessage);
                     break;
                 case NeedHelpMessage needHelpMessage:
                     HandleNeedHelp(needHelpMessage);
+                    break;
+                case ReachedDestinationMessage reachedDestinationMessage:
+                    HandleReachedDestination(reachedDestinationMessage);
                     break;
                 case RetreatMessage retreatMessage:
                     HandleRetreat(retreatMessage);
@@ -438,6 +551,30 @@ namespace AgentScript
         }
 
         /// <summary>
+        /// Sets destination to a position in the area around goToAreaMessage.destination.
+        /// </summary>
+        /// <param name="goHelpMessage"></param>
+        private void HandleGoToArea(GoToAreaMessage goToAreaMessage)
+        {
+            int maxIterations = 10; // Safeguard to prevent infinite loops
+            int iterationCount = 0;
+
+            do
+            {
+                SetRandomDestination(goToAreaMessage.destination.x - goToAreaMessage.radius, goToAreaMessage.destination.x + goToAreaMessage.radius,
+                    goToAreaMessage.destination.z - goToAreaMessage.radius, goToAreaMessage.destination.z + goToAreaMessage.radius);
+
+                iterationCount++;
+                if (iterationCount >= maxIterations)
+                {
+                    Debug.LogWarning($"{debugName}: Unable to find a valid random destination within {maxIterations} attempts.");
+                    break;
+                }
+
+            } while (agent.destination == goToAreaMessage.destination); // wait until the destination is different from the center of the area
+        }
+
+        /// <summary>
         /// Sets destination to the given position after receiving the order to go there from the leader.
         /// </summary>
         /// <param name="goToMessage"></param>
@@ -455,7 +592,49 @@ namespace AgentScript
             if (currentBehaviour != BEHAVIOURS.ATTACKING)
             {
                 SetEnemy(needHelpMessage.sender.currentEnemy);
+            }
+        }
 
+        /// <summary>
+        /// Tells the sender to wander around the area of the leader's destination while waiting for all the other troops to arrive.
+        /// If all units have arrived, sets a new destination and tells all the other troops to go there.
+        /// </summary>
+        /// <param name="reachedDestinationMessage"></param>
+        private void HandleReachedDestination(ReachedDestinationMessage reachedDestinationMessage)
+        {
+            if (!isLeader)
+            {
+                Debug.LogWarning("ReachedDestinationMessage received by a unit that is not a leader");
+                return;
+            }
+            
+            bool haveAllArrived = true;
+            foreach (var unit in SubTeamManager.GetSubTeam(this))
+            {
+                if (unit != this && (unit == reachedDestinationMessage.sender || unit.agent.destination != agent.destination)) // unit already reached destination and it's not the leader
+                {
+                    Debug.Log(unit.debugName + " reached destination, sending message to wander around leader's destination");
+                    // wander around leader's destination while waiting for all the other troops
+                    SendMessage(new GoToAreaMessage(this, unit, agent.destination));
+                }
+                else // unit hasn't reached destination yet
+                {
+                    Debug.Log(unit.debugName + " hasn't reached destination yet, waiting for it to arrive");
+                    haveAllArrived = false;
+                }
+            }
+            if (haveAllArrived)
+            {
+                Debug.Log("all have arrived, setting new destination");
+                // all units have reached destination, leader can set a new destination
+                SetRandomDestination();
+                foreach (var unit in SubTeamManager.GetSubTeam(this))
+                {
+                    if (unit != this)
+                    {
+                        SendMessage(new GoToMessage(this, unit, agent.destination));
+                    }
+                }
             }
         }
 
@@ -522,14 +701,6 @@ namespace AgentScript
                 Debug.LogWarning("SpottedEnemyMessage received by a unit that is not a leader");
             }
         }
-
-
-
-
-        // ...
-
-        // fonctions pour le leader ?
-        // ...
 
     }
 }

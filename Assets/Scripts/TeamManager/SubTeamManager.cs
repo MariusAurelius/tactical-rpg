@@ -2,6 +2,8 @@
 using UnityEngine;
 using AgentScript;
 using System.Linq;
+using System.Collections;
+using UnityEngine.AI;
 
 [System.Serializable]
 public class TeamConfiguration
@@ -17,19 +19,44 @@ public class TeamConfiguration
 
 public class SubTeamManager : MonoBehaviour
 {
+    [SerializeField] RedTeamSpawner redTeamSpawner;
+    [SerializeField] BlueTeamSpawner blueTeamSpawner;
+    public bool hasStarted = false;
     public List<TeamConfiguration> teamConfigurations; // Liste des configurations d'équipe
 
     public static Dictionary<int, Dictionary<int, List<Unit>>> subTeams = new(); // Dictionnaire des sous-équipes par équipe, avec le numéro de chaque sous-équipe comme identifiant de la sous-équipe
-    public static Dictionary<int, Unit> subTeamLeaders = new(); // Dictionnaire des leaders de sous-équipes par équipe
+    public static Dictionary<int, Dictionary<int, Unit>> subTeamLeaders = new(); // Dictionnaire des leaders de sous-équipes par équipe
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.C))
+        // Vérifie si la touche 'Espace' est pressée pour créer les sous-équipes
+        if (Input.GetKeyDown(KeyCode.Space) && !hasStarted)
         {
-            Debug.Log("Key Space pressed. Creating sub-teams...");
-            foreach (var config in teamConfigurations)
+            hasStarted = true;
+            Debug.Log("Key Space pressed. Spawning characters and creating sub-teams...");
+            redTeamSpawner.SpawnCharacters();
+            blueTeamSpawner.SpawnCharacters();
+
+            // Start the coroutine for delayed subteam assignment
+            StartCoroutine(DelayedSubTeamAssignment());
+        }
+    }
+
+    private IEnumerator DelayedSubTeamAssignment()
+    {
+        // Wait for one frame to ensure all Start() methods in Unit instances are executed
+        yield return null;
+
+        foreach (var config in teamConfigurations)
+        {
+            CreateSubTeams(config);
+        }
+        // After all subteams and leaders are assigned, set random destinations for leaders
+        foreach (var teamLeaders in subTeamLeaders.Values)
+        {
+            foreach (var leader in teamLeaders.Values)
             {
-                CreateSubTeams(config);
+                // leader.SetRandomDestination();
             }
         }
     }
@@ -107,7 +134,7 @@ public class SubTeamManager : MonoBehaviour
         {
             foreach (var unit in subTeam)
             {
-                unit.debugName = $"{unit.gameObject.name}(subteam {subTeamIndex})";
+                unit.debugName = $"{unit.gameObject.name}(subteam {subTeamIndex})" + (unit.isLeader ? " (Leader)" : "");
             }
             AssignLeader(config.teamId, subTeam);
         }
@@ -165,7 +192,7 @@ public class SubTeamManager : MonoBehaviour
         // Trouve les candidats pour le leader en fonction de la puissance
         foreach (Unit unit in subTeam)
         {
-            if (unit.gameObject != null)
+            if (unit != null)
             {    
                 if (unit.GetPower() > maxPower)
                 {
@@ -186,7 +213,22 @@ public class SubTeamManager : MonoBehaviour
             Unit leader = candidates[Random.Range(0, candidates.Count)];
             leader.isLeader = true;
             leader.gameObject.tag = "Leader"; // Ajoute le tag "Leader"
-            subTeamLeaders[teamId] = leader;
+            // subTeamLeaders[teamId] = new Dictionary<int, Unit>();
+            int subTeamId = GetSubTeamId(leader);
+            if (!subTeamLeaders.ContainsKey(teamId))
+            {
+                subTeamLeaders[teamId] = new Dictionary<int, Unit>();
+            }
+
+            if (subTeamLeaders[teamId].ContainsKey(subTeamId))
+            {
+                subTeamLeaders[teamId][subTeamId] = leader;
+            }
+            else
+            {
+                subTeamLeaders[teamId].Add(subTeamId, leader);
+            }
+
 
             foreach (var unit in subTeam)
             {

@@ -7,6 +7,7 @@ using UnityEngine;
 public class NeedHelpMessage : Message
 {
     // public int powerNeeded; //in this one ??
+    
     public NeedHelpMessage(Unit sender, Unit recipient) : base(sender, recipient)
     {
         Debug.Log("Message sent from " + sender.debugName + " to " + recipient.debugName + ": Need Help Message");

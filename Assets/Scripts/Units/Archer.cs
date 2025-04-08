@@ -5,14 +5,14 @@ public class Archer : Unit
 {
     Archer() 
     {
-        this.maxHp = 7;
+        this.maxHp = 21;
         this.currentHp = this.maxHp;
-        this.atk = 2;
-        this.atkSpeed = 1;
-        this.atkReach = 5;
+        this.atk = 4;
+        this.atkSpeed = 1.15f;
+        this.atkReach = 15;
 
-        this.movSpeed = 2;
+        this.movSpeed = 3;
 
-        this.power = 5;
+        this.power = 7;
     }
 }

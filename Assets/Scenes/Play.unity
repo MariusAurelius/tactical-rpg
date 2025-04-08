@@ -122,7 +122,7 @@ NavMeshSettings:
     preserveTilesOutsideBounds: 0
     debug:
       m_Flags: 0
-  m_NavMeshData: {fileID: 23800000, guid: 3d2e1b0042a184eac8890b9f1716d520, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: 1e73eb83ba03aac46aa36a88e70c1acb, type: 2}
 --- !u!1 &3744963
 GameObject:
   m_ObjectHideFlags: 0
@@ -1079,13 +1079,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 654685121}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3571842, y: 0.020846995, z: -0.0022359136, w: 0.9337986}
-  m_LocalPosition: {x: -7, y: 42, z: -127}
+  m_LocalRotation: {x: 0.51633596, y: 0.0028055392, z: 0.003236733, w: 0.8563754}
+  m_LocalPosition: {x: 0, y: 125.2, z: -92.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 41.849, y: 2.873, z: 0.824}
+  m_LocalEulerAnglesHint: {x: 62.17, y: 1, z: 1.036}
 --- !u!1 &671373385
 GameObject:
   m_ObjectHideFlags: 0
@@ -2477,7 +2477,7 @@ Transform:
   m_GameObject: {fileID: 1312100705}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -86.095436, y: 0.28479522, z: -129.08188}
+  m_LocalPosition: {x: -70, y: 0.1, z: -81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2563,7 +2563,7 @@ Transform:
   m_GameObject: {fileID: 1339103101}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -1, z: -44.4}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 200, y: 0.5, z: 200}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3210,7 +3210,7 @@ Transform:
   m_GameObject: {fileID: 1666506789}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -43.199303, y: 0.30476564, z: -79.852646}
+  m_LocalPosition: {x: -42, y: 0, z: -33}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3380,6 +3380,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3eabcfdb7f38548e09d5dced35242f9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  redTeamSpawner: {fileID: 1312100708}
+  blueTeamSpawner: {fileID: 1936128278}
+  hasStarted: 0
   teamConfigurations:
   - teamId: 1
     teamParent: {fileID: 1421173516}
@@ -3537,7 +3540,7 @@ Transform:
   m_GameObject: {fileID: 1936128275}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 78.00456, y: 0.28479522, z: 34.118114}
+  m_LocalPosition: {x: 65.9, y: 0.1, z: 68.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

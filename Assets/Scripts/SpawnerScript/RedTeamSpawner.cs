@@ -42,15 +42,7 @@ public class RedTeamSpawner : MonoBehaviour
         }
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            SpawnCharacters();
-        }
-    }
-
-    void SpawnCharacters()
+    public void SpawnCharacters()
     {
         int unit_id = 1;
         foreach (var composition in compositions)

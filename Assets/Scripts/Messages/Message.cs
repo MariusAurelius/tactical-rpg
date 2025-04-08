@@ -14,11 +14,11 @@ public abstract class Message
         this.recipient = recipient;
         if (sender == null)
         {
-            Debug.LogError(this.GetType().Name + ": Sender is null, recipient is " + recipient.gameObject.name);
+            Debug.LogError(this.GetType().Name + ": Sender is null, recipient is " + recipient.debugName);
         }
         if (recipient == null)
         {
-            Debug.LogError(this.GetType().Name + ": Recipient is null, sender is " + sender.gameObject.name);
+            Debug.LogError(this.GetType().Name + ": Recipient is null, sender is " + sender.debugName);
         }
         // Debug.Log("Message sent from " + sender.gameObject.name + " to " + recipient.gameObject.name + ": " + this.GetType().Name);
     }
@@ -34,6 +34,7 @@ public enum MessageType
     GoHelp = 3, // va aider une autre troupe
     GoTo = 3, // va quelque part
     NeedHelp = 2,
+    ReachedDestination = 0, // une troupe a atteint sa destination
     Retreat = 34,
     ShareGroupStatus = 6, // toutes les x secondes, le leader envoie un message à tous les leaders pour partager l'état de son groupe
     SharePosition = 0, // toutes les x secondes, les troupes d'un groupe envoient leur position au leader qui decide s'ils sont trop éloignés les uns des autres et doivent se regrouper ou non.
