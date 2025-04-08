@@ -444,10 +444,7 @@ namespace AgentScript
                 }
                 else
                 {
-                    if (currentEnemy.perceivedPower < this.power)
-                    {
-                        currentEnemy.perceivedPower = this.power;
-                    }
+                    currentEnemy.perceivedPower = Math.Max(this.power,currentEnemy.perceivedPower);
                 }
                 List<Unit> subTeam = SubTeamManager.GetSubTeam(this);
                 if (subTeam == null)
@@ -462,9 +459,8 @@ namespace AgentScript
 
                 // Désactive le trait bleu avant de détruire l'unité
                 attackLineRenderer.ToggleLine(false);
-                List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
                 subTeam.Remove(this);
-                currentEnemy.perceivedPower = Math.Max(this.power,currentEnemy.perceivedPower);
+                
                 if (isLeader)
                 {
                     Debug.Log("Leader " + leader.gameObject.name + " died, trying to find new leader");
@@ -1008,7 +1004,7 @@ namespace AgentScript
                 {
                     score += 5;
                 }
-                if (defendingUnit.isLowHp())
+                if (defendingUnit.IsLowHp())
                 {
                     score += 10;
                 }
