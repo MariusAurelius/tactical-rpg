@@ -431,7 +431,7 @@ namespace AgentScript
         void ReduceHp(int dmgTaken)
         {
             this.currentHp -= dmgTaken;
-            if(isLowHp() && !hasCalledForHelp)
+            if(IsLowHp() && !hasCalledForHelp)
             {
                 chooseBestAction(this, currentEnemy);
                 hasCalledForHelp = true;
