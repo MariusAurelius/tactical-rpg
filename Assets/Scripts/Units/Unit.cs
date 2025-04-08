@@ -5,6 +5,7 @@ using System.Linq;
 using System.Xml.Schema;
 using UnityEngine;
 using UnityEngine.AI;
+using static Unity.VisualScripting.Metadata;
 
 namespace AgentScript
 {
@@ -34,6 +35,7 @@ namespace AgentScript
         protected int atkSpeed;
         protected int atkReach;
         protected float attackCooldown = 0f;
+        protected bool hasCalledForHelp = false;
 
         [SerializeField] private float visionAngle = 60f; // Angle de vision en degrés
         [SerializeField] private float visionRange = 100f; // Portée de vision
@@ -87,11 +89,7 @@ namespace AgentScript
         {
             agent.isStopped = false; // Autorise le mouvement dans les autres comportements
         }
-            // if (leader == null)
-            // {
-            //     leader = GetLeader();
-            //     isLeader = (leader == this);
-            // }
+          
             if (this.currentEnemy == null /*&& leader didn't tell us where to go: agent.destination or behaviour wandering*/)
             {
                 currentBehaviour = BEHAVIOURS.WANDERING;
@@ -118,7 +116,7 @@ namespace AgentScript
             if (currentEnemy != null)
             {
                 agent.isStopped = true;
-
+                
                 Vector3 directionToEnemy = (currentEnemy.transform.position - transform.position).normalized;
                 Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToEnemy.x, 0, directionToEnemy.z));
                 transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 10f);
@@ -292,13 +290,20 @@ namespace AgentScript
 
         }
 
+
         void ReduceHp(int dmgTaken)
         {
             this.currentHp -= dmgTaken;
+            if(isLowHp() && !hasCalledForHelp)
+            {
+                chooseBestAction(this, currentEnemy);
+                hasCalledForHelp = true;
+            }
             if (this.currentHp <= 0)
             {
                 List<Unit> subTeam = SubTeamManager.GetSubTeam(this); // should assign this to subTeams[this subteam]
                 subTeam.Remove(this);
+                currentEnemy.perceivedPower = Math.Max(this.power,currentEnemy.perceivedPower);
                 if (isLeader)
                 {
                     Debug.Log("Leader " + leader.gameObject.name + " died, trying to find new leader");
@@ -465,6 +470,7 @@ namespace AgentScript
         {
             // gather power of nearby troops
             List<Unit> nearbyTroops = GetFriendlyTroopsNearby();
+
             List<Unit> availableNearbyTroops = new();
             int combinedPower = 0;
             foreach (Unit unit in nearbyTroops)
@@ -575,27 +581,10 @@ namespace AgentScript
                 // decide if should attack enemy or ask for help before attacking with score based by minimax
                 if (USE_MINIMAX)
                 {
-                    Node bestMove = GetBestMove(new Node(MINIMAX_DEPTH, spottedEnemyMessage.sender, spottedEnemyMessage.enemy), MINIMAX_DEPTH, true);
-                    switch (bestMove.associatedState) {
-                        case Node.ENCOUNTER_STATES.ALLIES_CALLED:
-                            SendMessage(new AskForHelp(this, spottedEnemyMessage.sender, spottedEnemyMessage.enemy));
-                            break;
-                        case Node.ENCOUNTER_STATES.ENNEMY_RETREAT_CALLED:
-                            SendMessage(new AttackEnemyMessage(this, spottedEnemyMessage.sender, spottedEnemyMessage.enemy));
-                            break;
-                        case Node.ENCOUNTER_STATES.RETREAT_CALLED:
-                        case Node.ENCOUNTER_STATES.ENNEMIES_CALLED:
-                            SendMessage(new RetreatMessage(this, spottedEnemyMessage.sender));
-                            break;
-                        default:
-                            SendMessage(new RetreatMessage(this, spottedEnemyMessage.sender));
-                            break;
-
-                    }
+                    chooseBestAction(spottedEnemyMessage.sender, spottedEnemyMessage.enemy);
                 }
                 else
                 {
-
 
                     // decide if should attack enemy or ask for help before attacking
                     if (spottedEnemyMessage.sender.ShouldAttackEnemy(spottedEnemyMessage.enemy))
@@ -620,27 +609,34 @@ namespace AgentScript
             }
         }
 
-
-
-        public static Node GetBestMove(Node node, int depth, bool maximizingPlayer)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="attackingUnit"></param>
+        /// <param name="defendingUnit"></param>
+        public void chooseBestAction(Unit attackingUnit, Unit defendingUnit)
         {
-            Node bestMove = null;
-            int bestValue = maximizingPlayer ? Int32.MinValue : Int32.MaxValue;
-
-            foreach (var child in node.children)
+            Node origin = new Node(MINIMAX_DEPTH, attackingUnit, defendingUnit);
+            Node bestMove = origin.children.OrderByDescending(child => child.score).FirstOrDefault();
+            switch (bestMove.associatedState)
             {
-                int eval = Minimax(child, depth - 1, !maximizingPlayer);
+                case Node.ENCOUNTER_STATES.ALLIES_CALLED:
+                    SendMessage(new AskForHelp(this, attackingUnit, defendingUnit));
+                    break;
+                case Node.ENCOUNTER_STATES.ENNEMY_RETREAT_CALLED:
+                    SendMessage(new AttackEnemyMessage(this, attackingUnit, defendingUnit));
+                    break;
+                case Node.ENCOUNTER_STATES.RETREAT_CALLED:
+                case Node.ENCOUNTER_STATES.ENNEMIES_CALLED:
+                    SendMessage(new RetreatMessage(this, attackingUnit));
+                    break;
+                default:
+                    SendMessage(new RetreatMessage(this, attackingUnit));
+                    break;
 
-                if ((maximizingPlayer && eval > bestValue) ||
-                    (!maximizingPlayer && eval < bestValue))
-                {
-                    bestValue = eval;
-                    bestMove = child;
-                }
             }
-
-            return bestMove;
         }
+
 
 
 
@@ -694,7 +690,7 @@ namespace AgentScript
             private bool retreatCalled = false;
             private bool enemyRetreatCalled = false;
             public int score;
-            public ENCOUNTER_STATES associatedState = ENCOUNTER_STATES.RETREAT_CALLED;
+            public ENCOUNTER_STATES associatedState = ENCOUNTER_STATES.ALLIES_CALLED;
             public enum ENCOUNTER_STATES
             {
                 ALLIES_CALLED, //The attacking unit is calling for help
@@ -720,25 +716,31 @@ namespace AgentScript
 
                     foreach (ENCOUNTER_STATES state in Enum.GetValues(typeof(ENCOUNTER_STATES)))
                     {
-                        children.Add(new Node(desiredDepth - 1, state, this));
+                        children.Add(new Node(desiredDepth - 1, state, this, true));
                     }
                 }
+                this.score = Minimax(this, desiredDepth, true);
             }
-            private Node(int desiredDepth, ENCOUNTER_STATES stateToApply, Node parent)
+            private Node(int desiredDepth, ENCOUNTER_STATES stateToApply, Node parent, bool maximizingPlayer)
             {
                 attackingUnit = parent.attackingUnit;
                 defendingUnit = parent.defendingUnit;
                 nearbyAllies = parent.nearbyAllies;
                 nearbyEnnemies = parent.nearbyEnnemies;
+                alliesCalled = parent.alliesCalled;
+                enemiesCalled = parent.enemiesCalled;
+                retreatCalled = parent.retreatCalled;
+                enemyRetreatCalled = parent.enemyRetreatCalled;
                 this.ApplyState(stateToApply);
                 this.associatedState = stateToApply;
-                if (desiredDepth > 0 || enemyRetreatCalled || retreatCalled) //A unit calling a retreat will prune the rest of the branch and make this node a terminal node
+                if (desiredDepth > 0 && (!enemyRetreatCalled && !retreatCalled)) //A unit calling a retreat will prune the rest of the branch and make this node a terminal node
                 {
                     foreach(ENCOUNTER_STATES state in Enum.GetValues(typeof(ENCOUNTER_STATES))){
-                        children.Add(new Node(desiredDepth -  1, state, this));
+                        children.Add(new Node(desiredDepth -  1, state, this, !maximizingPlayer));
                     }
                 }
-                
+                this.score = Minimax(this, desiredDepth, maximizingPlayer); ;
+
             }
 
             public void ApplyState(ENCOUNTER_STATES stateToApply)
@@ -761,7 +763,14 @@ namespace AgentScript
             public int Evaluate()
             {
                 int score = 0;
-
+                if (!defendingUnit.hasBeenAttacked)
+                {
+                    score += 5;
+                }
+                if (defendingUnit.isLowHp())
+                {
+                    score += 10;
+                }
                 if (retreatCalled)
                 {
                     score -= 5;
@@ -775,6 +784,10 @@ namespace AgentScript
                 if (defendingUnit.perceivedPower > attackingUnit.power)
                 {
                     score -= 5;
+                }
+                else
+                {
+                    score += 5;
                 }
                 if (alliesCalled)
                 {
