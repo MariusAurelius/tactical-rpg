@@ -13,8 +13,7 @@ public class TeamConfiguration
     public int minSubTeams = 1; // Nombre minimum de sous-équipes
     public int minUnitsPerSubTeam = 1; // Nombre minimum d'unités par sous-équipe
 
-    [HideInInspector]
-    public int subTeamCount = 3; // Nombre de sous-équipes souhaité, non modifiable dans l'inspecteur Unity
+    [HideInInspector] public int subTeamCount = 3; // Nombre de sous-équipes souhaité, non modifiable dans l'inspecteur Unity
 }
 
 public class SubTeamManager : MonoBehaviour

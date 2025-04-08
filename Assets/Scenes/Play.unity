@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028301, g: 0.22571309, b: 0.30692127, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -469,6 +469,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &346896199
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.034793854
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1788065662900251122, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4480984088472025493, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
+      propertyPath: m_Name
+      value: Archer_Red
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
 --- !u!1 &347838624
 GameObject:
   m_ObjectHideFlags: 0
@@ -2495,9 +2552,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd74a0237e48d41ec9aa4103dfeccc5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warriorPrefab: {fileID: 111886, guid: 10b8f8b81a78d2b488d260466a8883d3, type: 3}
-  peasantPrefab: {fileID: 171706, guid: 0925457c2b2fe9f4a8747c59013d56d4, type: 3}
-  archerPrefab: {fileID: 104176, guid: 359a3881d0d0e4143a67b57d6482e854, type: 3}
+  warriorPrefab: {fileID: 3583581354743002515, guid: f1a57ae3ea21b4560b36fc55a6cf6830, type: 3}
+  peasantPrefab: {fileID: 4428492859242982671, guid: 49d6fcf8abe834d9688e9b71de30ca22, type: 3}
+  archerPrefab: {fileID: 4480984088472025493, guid: 3049862ed710c40d5a2bb22f2b50d8c2, type: 3}
   spawnPoint: {fileID: 1312100707}
   teamParent: {fileID: 1421173516}
 --- !u!1 &1332294734
@@ -3558,9 +3615,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be90c47f6cc344ac5931d49157fc5183, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warriorPrefab: {fileID: 172688, guid: 6724992a26d21854798810e3993415be, type: 3}
-  peasantPrefab: {fileID: 179034, guid: a680ac69aa15dce4ca3d34bc515f671d, type: 3}
-  archerPrefab: {fileID: 142034, guid: b81ba67e44b1b174d9ef4491f146ee35, type: 3}
+  warriorPrefab: {fileID: 8262471557189843758, guid: 40159d8f151fd43348408ebfb2a68ed7, type: 3}
+  peasantPrefab: {fileID: 5545454582595892986, guid: 9cdc08933c6694a338969566a1c25bf9, type: 3}
+  archerPrefab: {fileID: 8352160061908802410, guid: 76fa2b41499a444c0a4229be502eb12a, type: 3}
   spawnPoint: {fileID: 1936128277}
   teamParent: {fileID: 344082331}
 --- !u!1 &1960760441
@@ -3888,3 +3945,4 @@ SceneRoots:
   - {fileID: 1421173516}
   - {fileID: 344082331}
   - {fileID: 1761433662}
+  - {fileID: 346896199}

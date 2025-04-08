@@ -13,6 +13,6 @@ public class Warrior : Unit
 
         this.movSpeed = 3; // 2
 
-        this.power = 10;
+        this.power = 7;
     }
 }

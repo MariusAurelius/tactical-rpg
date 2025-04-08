@@ -12,7 +12,7 @@ public class Peasant : Unit
 
         this.movSpeed = 3; // 2.5f
 
-        this.power = 5;
+        this.power = 3;
     }
 
      
