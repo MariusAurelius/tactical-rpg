@@ -11,44 +11,72 @@ public class ScenesManager : MonoBehaviour
 {
     public static ScenesManager Instance;
 
-    private void Awake() {
+    private void Awake()
+    {
         Instance = this;
     }
 
-    public enum Scenes { // have to be in the same order as build settings
-        TitleScreen, 
+    public enum Scenes
+    { // have to be in the same order as build settings
+        TitleScreen,
         MainMenu,
-        GeneralSettingsMenu, 
+        GeneralSettingsMenu,
         GameSettingsMenu,
-        Play
+        Maze,
+        Jungle
     }
 
-    public void LoadScene(Scenes scene) {
+    public void LoadScene(Scenes? scene)
+    {
+        if (scene == null)
+        {
+            Debug.LogWarning("Scene is null. Cannot load scene.");
+            return;
+        }
         SceneManager.LoadScene(scene.ToString());
     }
 
-    public void LoadTitleScreen() {
+    public void LoadTitleScreen()
+    {
         SceneManager.LoadScene(Scenes.TitleScreen.ToString());
     }
 
-    public void LoadMainMenu() {
+    public void LoadMainMenu()
+    {
         SceneManager.LoadScene(Scenes.MainMenu.ToString());
     }
 
-    public void LoadGeneralSettingsMenu() {
+    public void LoadGeneralSettingsMenu()
+    {
         SceneManager.LoadScene(Scenes.GeneralSettingsMenu.ToString());
     }
 
-    public void LoadGameSettingsMenu() {
+    public void LoadGameSettingsMenu()
+    {
         SceneManager.LoadScene(Scenes.GameSettingsMenu.ToString());
     }
 
+    /// <summary>
+    /// Loads the game scene based on the saved game settings.
+    /// </summary>
+    public void LoadGame()
+    {
+        GameSettings gameSettings = GameSettingsMenu.GetSavedGameSettings();
+        string mapScene = gameSettings.MapName;
 
-    public void LoadPlay() {
-        SceneManager.LoadScene(Scenes.Play.ToString());
+        if (Application.CanStreamedLevelBeLoaded(mapScene))
+        {
+            SceneManager.LoadScene(mapScene);
+        }
+        else
+        {
+            Debug.LogWarning($"Scene '{mapScene}' does not exist. Loading default scene 'Maze'.");
+            SceneManager.LoadScene("Maze");
+        }
     }
 
-    public void QuitGame() {
+    public void QuitGame()
+    {
         Debug.Log("Quitting Game...");
         Application.Quit();
     }
@@ -56,7 +84,8 @@ public class ScenesManager : MonoBehaviour
     /// <summary>
     /// Gets the current scene as a Scenes enum value.
     /// </summary>
-    public Scenes? GetCurrentScene() {
+    public Scenes? GetCurrentScene()
+    {
         string sceneName = SceneManager.GetActiveScene().name;
         if (Enum.TryParse(sceneName, out Scenes sceneEnum))
         {
@@ -65,7 +94,7 @@ public class ScenesManager : MonoBehaviour
         else
         {
             Debug.LogWarning($"current scene '{sceneName}' not in the Scenes enum.");
-            return null;       
+            return null;
         }
     }
 }

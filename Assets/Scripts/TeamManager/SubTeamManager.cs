@@ -39,6 +39,35 @@ public class SubTeamManager : MonoBehaviour
             // Start the coroutine for delayed subteam assignment
             StartCoroutine(DelayedSubTeamAssignment());
         }
+
+        // Vérifie si la touche 'R' est pressée pour réinitialiser les sous-équipes
+        if (Input.GetKeyDown(KeyCode.R) && hasStarted)
+        {
+            Debug.Log("Key R pressed. Resetting scene...");
+            ScenesManager.Instance.LoadScene(ScenesManager.Instance.GetCurrentScene());
+        }
+
+        // Vérifie si la touche 'P' est pressée pour mettre le jeu en pause
+        if (Input.GetKeyDown(KeyCode.P) && hasStarted)
+        {
+            if (Time.timeScale == 1)
+            {
+                Debug.Log("Game paused.");
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Debug.Log("Game resumed.");
+                Time.timeScale = 1;
+            }
+        }
+
+        // Vérifie si la touche 'Esc' est pressée pour revenir au menu principal
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Key Escape pressed. Returning to main menu...");
+            ScenesManager.Instance.LoadMainMenu();
+        }
     }
 
     private IEnumerator DelayedSubTeamAssignment()

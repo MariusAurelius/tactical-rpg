@@ -28,7 +28,7 @@ public class CompositionProvider : MonoBehaviour
     void LoadCompositionData()
     {
         // Load the game settings from the JSON file
-        GameSettings gameSettings = FileHandler.ReadFromJSON<GameSettings>(_SAVE_FILENAME);
+        GameSettings gameSettings = GameSettingsMenu.GetSavedGameSettings();
 
         if (gameSettings != null)
         {
