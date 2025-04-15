@@ -10,7 +10,7 @@ public class GoToAreaMessage : Message
     public Vector3 destination;
     public float radius;
 
-    public GoToAreaMessage(Unit sender, Unit recipient, Vector3 destination, float radius = 5f) : base(sender, recipient)
+    public GoToAreaMessage(Unit sender, Unit recipient, Vector3 destination, float radius = 4.0f) : base(sender, recipient)
     {
         this.destination = destination;
         this.radius = radius;

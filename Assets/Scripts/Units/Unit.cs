@@ -121,6 +121,9 @@ namespace AgentScript
         /// </summary>
         public string debugName;
 
+        private Vector3 previousDestination;
+
+
         void Start()
         {
 
@@ -130,10 +133,32 @@ namespace AgentScript
 
             // Initialisation du VisionLineRenderer
             attackLineRenderer = new AttackLineRenderer(gameObject);
+
+            previousDestination = agent.destination;
         }
 
         void Update()
         {
+            // Debug.DrawLine(transform.position, agent.destination, Color.green, 1f);
+            if (agent.destination != previousDestination && isLeader)
+            {
+                Debug.Log($"{debugName}: Destination changed to {agent.destination}");
+                foreach (var unit in SubTeamManager.GetSubTeam(this))
+                {
+                    if (unit != this) // Skip the leader
+                    {
+                        Debug.Log($"Leader {debugName} sending GoToMessage to {unit.debugName} with destination {agent.destination}");
+                        SendMessage(new GoToMessage(this, unit, agent.destination));
+                    }
+                }
+                if (SubTeamManager.GetSubTeam(this) == null)
+                {
+                    Debug.LogWarning($"Subteam is null");
+                    return;
+                }
+                previousDestination = agent.destination; // Update the previous destination
+            }
+
             if (currentBehaviour == BEHAVIOURS.ATTACKING)
             {
                 agent.isStopped = true; // Empêche le mouvement pendant l'attaque
@@ -234,6 +259,8 @@ namespace AgentScript
                 Debug.LogError($"{debugName}: NavMeshAgent is not active or enabled.");
                 return;
             }
+
+            
             
             Vector3 moveto;
             int maxAttempts = 10; // Limit the number of attempts to find a valid destination
@@ -252,6 +279,19 @@ namespace AgentScript
             {
                 agent.SetDestination(moveto);
                 Debug.Log(debugName + ": Valid destination set to " + moveto);
+                
+                if (isLeader)
+                {
+                    foreach (var unit in SubTeamManager.GetSubTeam(this))
+                    {
+                        if (unit != this) // Skip the leader
+                        {
+                            Debug.Log($"Leader {debugName} sending GoToMessage to {unit.debugName} with destination {agent.destination}");
+                            SendMessage(new GoToMessage(this, unit, agent.destination));
+                        }
+                    }
+                }
+
                 return;
             }
 
@@ -312,7 +352,7 @@ namespace AgentScript
                             }
                             else
                             {
-                                Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.red, 0.1f); // Rayon rouge si un obstacle bloque la vue
+                                // Debug.DrawRay(transform.position, directionToUnit * visionRange, Color.red, 0.1f); // Rayon rouge si un obstacle bloque la vue
                                 //Debug.Log("Enemy blocked by obstacle: " + hit.collider.gameObject.name);
                             }
                         }
@@ -573,6 +613,10 @@ namespace AgentScript
 
         public void SendMessage(Message message)
         {
+            // if (isLeader)
+            // {
+            //     Debug.Log("leader sent " + message.GetType() + " to " + message.recipient.debugName);
+            // }
             if (message.recipient != null)
             {
                 message.recipient.ReceivedMessages.Enqueue(message);
